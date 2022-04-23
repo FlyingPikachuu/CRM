@@ -353,4 +353,15 @@
     where c.id=#{id};
   </select>
 
+  <select id="selectClueForConvertById" parameterType="string" resultMap="BaseResultMap">
+    select *
+    from tbl_clue
+    where id=#{id};
+  </select>
+
+  <delete id="deleteClue" parameterType="string">
+    delete
+    from tbl_clue
+    where id = #{id};
+  </delete>
 </mapper>

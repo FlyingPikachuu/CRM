@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qsy.workbench.dao.ContactActivityRelationMapper">
+  <resultMap id="BaseResultMap" type="com.qsy.workbench.pojo.ContactActivityRelation">
+    <id column="id" jdbcType="CHAR" property="id" />
+    <result column="contact_id" jdbcType="CHAR" property="contactId" />
+    <result column="activity_id" jdbcType="CHAR" property="activityId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, contact_id, activity_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_contact_activity_relation
+    where id = #{id,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tbl_contact_activity_relation
+    where id = #{id,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.qsy.workbench.pojo.ContactActivityRelation">
+    insert into tbl_contact_activity_relation (id, contact_id, activity_id
+      )
+    values (#{id,jdbcType=CHAR}, #{contactId,jdbcType=CHAR}, #{activityId,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qsy.workbench.pojo.ContactActivityRelation">
+    insert into tbl_contact_activity_relation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="contactId != null">
+        contact_id,
+      </if>
+      <if test="activityId != null">
+        activity_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="contactId != null">
+        #{contactId,jdbcType=CHAR},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qsy.workbench.pojo.ContactActivityRelation">
+    update tbl_contact_activity_relation
+    <set>
+      <if test="contactId != null">
+        contact_id = #{contactId,jdbcType=CHAR},
+      </if>
+      <if test="activityId != null">
+        activity_id = #{activityId,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qsy.workbench.pojo.ContactActivityRelation">
+    update tbl_contact_activity_relation
+    set contact_id = #{contactId,jdbcType=CHAR},
+      activity_id = #{activityId,jdbcType=CHAR}
+    where id = #{id,jdbcType=CHAR}
+  </update>
+  <insert id="insertContactActivityRelation" parameterType="list">
+    insert into tbl_contact_activity_relation (id, contact_id, activity_id)
+    values
+    <foreach collection="list" item="carList" separator=",">
+      (#{carList.id}, #{carList.contactId}, #{carList.activityId})
+    </foreach>
+  </insert>
+</mapper>

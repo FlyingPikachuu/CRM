@@ -48,8 +48,8 @@ public interface ActivityMapper {
     //根据用户所选择关联的市场活动的Id查询市场活动
     List<Activity> selectActivityForBundByIds(String[] Ids);
 
-    List<Activity> selectActivityFroConvertByNameClueId(Map<String,Object> map);
     //根据活动姓名模糊查询与指定线索已关联的活动信息
+    List<Activity> selectActivityFroConvertByNameClueId(Map<String,Object> map);
 
 
 }

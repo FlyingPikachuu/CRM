@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
@@ -177,6 +178,7 @@ public class ClueController {
     @RequestMapping("/workbench/clue/deleteRelation.do")
     @ResponseBody
     public Object deleteRelation(ClueActivityRelation clueActivityRelation){
+        System.out.println(clueActivityRelation.getActivityId());
         ReturnInfoObject returnInfoObject = new ReturnInfoObject();
         try {
             int ret = clueActivityRelationService.deleteClueActivityRelationByActivityIdClueId(clueActivityRelation);
@@ -215,6 +217,23 @@ public class ClueController {
         List<Activity> activityList = activityService.queryActivityFroConvertByNameClueId(map);
         System.out.println(activityList);
         return  activityList;
+    }
+
+    @RequestMapping("/workbench/clue/saveConvertClue.do")
+    @ResponseBody
+    public Object saveConvertClue(@RequestParam Map<String,Object> map, HttpSession session){
+        ReturnInfoObject returnInfoObject = new ReturnInfoObject();
+        map.put(Constants.SESSION_USER,session.getAttribute(Constants.SESSION_USER));
+
+        try {
+            cLueService.saveConvertClue(map);
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+            returnInfoObject.setMessage("系统忙，请稍后重试···");
+        }
+        return  returnInfoObject;
     }
 
 }

@@ -20,6 +20,12 @@ public interface ClueActivityRelationMapper {
     //批量保存市场活动和线索关联关系
     int insertClueActivityRelation(List<ClueActivityRelation> list);
 
-    //接触关联关系
+    //解除关联关系,根据clueId和activityId删除线索和市场活动的关联关系
     int deleteClueActivityRelationByActivityIdClueId(ClueActivityRelation clueActivityRelation);
+
+    //根据ClueId查询关联记录
+    List<ClueActivityRelation> selectClueActivityRelationByClueId(String clueId);
+
+    //根据ClueId删除关联关系
+    int deleteClueActivityRelationByClueId(String id);
 }

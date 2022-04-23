@@ -20,4 +20,7 @@ public interface CLueService {
     int queryCountOfClueByCondition(Map<String,Object> map);
 
     Clue queryClueForDetailById(String id);
+
+    //保存线索转换
+    void saveConvertClue(Map<String,Object> map);
 }

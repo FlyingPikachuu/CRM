@@ -17,7 +17,7 @@ public interface ClueRemarkMapper {
 
     int updateByPrimaryKey(ClueRemark row);
 
-    //查询指定线索下的全部备注
+    //查询线索明细页面的全部备注
     List<ClueRemark> selectClueRemarkForDetailByClueId(String clueId);
 
     //添加一条线索
@@ -26,5 +26,10 @@ public interface ClueRemarkMapper {
     int updateClueRemark(ClueRemark clueRemark);
 
     int deleteClueRemarkById(String id);
+
+    //查询指定线索下全部备注
+    List<ClueRemark> selectClueRemarkForConvertByClueId(String clueId);
+
+    int deleteClueRemarkByClueId(String clueId);
 
 }

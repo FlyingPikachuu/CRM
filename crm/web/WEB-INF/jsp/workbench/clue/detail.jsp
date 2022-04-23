@@ -112,8 +112,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						$("#remarkHeader").after(htmlStr);
 
 						$("#add-ClueRemark").val("");
-						$("#cancelAndSaveBtn").hide();
-
 					}
 					else{
 						alert(data.message);
@@ -274,7 +272,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							htmlStr+="<td>"+obj.startDate+"</td>"
 							htmlStr+="<td>"+obj.endDate+"</td>"
 							htmlStr+="<td>"+obj.owner+"</td>"
-							htmlStr+="<td><a href=\"javascript:void(0);\"  activtityId=\""+obj.id+"\" style=\"text-decoration: none;\"><span class=\"glyphicon glyphicon-remove\"></span>解除关联</a></td>"
+							htmlStr+="<td><a href=\"javascript:void(0);\"    activityId=\""+obj.id+"\" style=\"text-decoration: none;\"><span class=\"glyphicon glyphicon-remove\"></span>解除关联</a></td>"
 							htmlStr+="</tr>"
 						});
 						$("#bundTbody").append(htmlStr);
@@ -296,6 +294,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		$("#bundTbody").on("click","a",function (){
 			//收集参数
 			let activityId=$(this).attr("activityId");
+			console.log(activityId);
 			let clueId = '${clue.id}';
 
 			if(window.confirm("确定解除吗？")){
@@ -407,7 +406,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						</tbody>
 					</table>
 				</div>
-				<div class="modal-footer">
+				<div id="bundDiv" class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
 					<button type="button" class="btn btn-primary" id="saveBundBtn">关联</button>
 				</div>
@@ -605,7 +604,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<td>${al.startDate}</td>
 							<td>${al.endDate}</td>
 							<td>${al.owner}</td>
-							<td><a href="javascript:void(0);"  activityId="${al.id}" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
+							<td><a href="javascript:void(0);" id="unbundA" activityId="${al.id}" style="text-decoration: none;"><span class="glyphicon glyphicon-remove"></span>解除关联</a></td>
 						</tr>
 					</c:forEach>
 

@@ -88,6 +88,39 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 
 			$("#searchActivityModal").modal("hide");
 		});
+
+		//给”转换“按钮添加点击事件
+		$("#ConvertBtn").click(function (){
+			let clueId = '${clue.id}';
+			let money  = $("#amountOfMoney").val();
+			let tradeName = $("#tradeName").val();
+			let expectedDate =$("#expectedDate").val();
+			let stage = $("#stage").val();
+			let activityId = $("#activityId").val();
+			let isCreateTran = $("#isCreateTransaction").prop('checked');
+			$.ajax({
+				url:'workbench/clue/saveConvertClue.do',
+				data:{
+					clueId:clueId,
+					money:money,
+					tradeName:tradeName,
+					expectedDate:expectedDate,
+					stage:stage,
+					activityId:activityId,
+					isCreateTran:isCreateTran
+				},
+				type:'post',
+				datatype:'json',
+				success:function(data){
+					if(data.code=="1"){
+						window.location.href='workbench/clue/index.do';
+					}else{
+						alert(data.message);
+					}
+				}
+			});
+		});
+
 	});
 </script>
 
@@ -171,8 +204,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		    <input type="text" class="form-control" id="tradeName" value="${clue.company}-">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
-		    <label for="expectedClosingDate">预计成交日期</label>
-		    <input type="text" class="form-control" id="expectedClosingDate">
+		    <label for="expectedDate">预计成交日期</label>
+		    <input type="text" class="form-control" id="expectedDate">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
 		    <label for="stage">阶段</label>
@@ -197,7 +230,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		<b>${clue.owner}</b>
 	</div>
 	<div id="operation" style="position: relative; left: 40px; height: 35px; top: 100px;">
-		<input class="btn btn-primary" type="button" value="转换">
+		<input id="ConvertBtn" class="btn btn-primary" type="button" value="转换">
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<input class="btn btn-default" type="button" value="取消">
 	</div>

@@ -27,8 +27,13 @@ public interface ClueMapper {
     //查询线索总条数
     int selectCountOfClueByCondition(Map<String,Object> map);
 
-    //根据Id查询线索信息
+    //根据Id查询线索明细信息
     Clue selectClueForDetailById(String id);
 
+    //根据Id查询线索信息（数据库内信息）
+    Clue selectClueForConvertById(String id);
+
+    //根据Id删除线索
+    int deleteClue(String id);
 
 }

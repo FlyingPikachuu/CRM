@@ -166,12 +166,15 @@ public class ClueServiceImpl implements CLueService {
         if("true".equals(isCreateTran)){
             Transaction ts = new Transaction();
             ts.setId(IDUtils.getId());
+            ts.setOwner(user.getId());
+            ts.setCreateBy(user.getId());
+            ts.setCreateTime(DateUtils.formatDateTime(new Date()));
             ts.setMoney((String) map.get("money"));
             ts.setStage((String) map.get("stage"));
             ts.setActivityId((String) map.get("activityId"));
             ts.setContactId(ct.getId());
             ts.setCustomerId(c.getId());
-            ts.setExpectedDate((String) map.get("expectDate"));
+            ts.setExpectedDate((String) map.get("expectedDate"));
             ts.setName((String) map.get("tradeName"));
             transactionMapper.insertTransaction(ts);
 

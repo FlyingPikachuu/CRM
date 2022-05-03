@@ -60,22 +60,22 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				return;
 			}
 			let regExpEmail=/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
-			if(!regExpEmail.test(email)){
+			if(!regExpEmail.test(email)&&email!=""){
 				alert("邮件格式不正确！");
 				return;
 			}
 			let regExpPhone=/^((\d{3,4}-)|\d{3,4}-)?\d{7,8}$/;
-			if(!regExpPhone.test(phone)){
+			if(!regExpPhone.test(phone)&&phone!=""){
 				alert("座机格式不正确！");
 				return;
 			}
 			let regExpMphone=/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
-			if(!regExpMphone.test(mphone)){
+			if(!regExpMphone.test(mphone)&&mphone!=""){
 				alert("手机格式不正确！");
 				return;
 			}
 			let regExpWebsite=/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/;
-			if(!regExpWebsite.test(website)){
+			if(!regExpWebsite.test(website)&&website!=""){
 				alert("公司网站格式不正确！");
 				return;
 			}
@@ -106,6 +106,9 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					if(data.code==1){
 						//关闭模态窗口
 						$("#createClueModal").modal("hide");
+
+						queryClueForPageByCondition(1,$("#clue_pag").bs_pagination("getOption","rowsPerPage"));
+
 					}
 					else{
 						//提示信息
@@ -151,6 +154,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		let mphone =$("#query-mphone").val();
 		let source =$("#query-source").val();
 		let state =$("#query-state").val();
+		console.log(state);
 
 		//发送请求
 		$.ajax({
@@ -166,7 +170,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				pageNo  : pageNo,
 				pageSize : pageSize
 			},
-			type:"post",
+			type:"get",
 			datatype: "json",
 			success:function (data) {
 				//线索列表
@@ -175,7 +179,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				$.each(data.clueList, function (index, obj) {
 					htmlStr += "<tr>"
 					htmlStr += "<td><input type=\"checkbox\" /></td>"
-					htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/clue/clueDetail.do?id="+obj.id+"';\">" + obj.fullname + "" + obj.appellation + "</a></td>"
+					htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/clue/clueDetail.do/"+obj.id+"';\">" + obj.fullname + "" + obj.appellation + "</a></td>"
 					htmlStr += "<td>" + obj.company + "</td>"
 					htmlStr += "<td>" + obj.phone + "</td>"
 					htmlStr += "<td>" + obj.mphone + "</td>"

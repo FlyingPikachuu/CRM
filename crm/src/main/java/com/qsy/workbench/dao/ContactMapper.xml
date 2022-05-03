@@ -239,4 +239,10 @@
     values (#{id},#{ owner},#{ source},#{ customerId},#{ fullname},#{ appellation},#{ email},#{ mphone},#{ job},#{ createBy},#{
                              createTime},#{ description},#{ contactSummary},#{ nextContactTime},#{ address});
   </insert>
+
+  <select id="selectContactForSaveTran" parameterType="string" resultMap="BaseResultMap">
+    select id,fullname,email,mphone
+    from tbl_contact
+    where fullname like '%' #{fullname} '%';
+  </select>
 </mapper>

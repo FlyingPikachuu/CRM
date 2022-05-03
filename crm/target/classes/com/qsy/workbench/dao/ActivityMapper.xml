@@ -289,7 +289,7 @@
     </where>
   </select>
 
-  <select id="selectActivityFroConvertByNameClueId" parameterType="map" resultMap="BaseResultMap">
+  <select id="selectActivityForConvertByNameClueId" parameterType="map" resultMap="BaseResultMap">
     select a.id,a.name,a.start_date,a.end_date,u.name as owner
     from tbl_activity a
     join tbl_user u on a.owner = u.id
@@ -298,5 +298,12 @@
       from tbl_clue_activity_relation
       where clue_id=#{clueId}
     )
+  </select>
+
+  <select id="selectActivityForSaveTran" parameterType="string" resultMap="BaseResultMap">
+    select a.id, u.name as owner, a.name, a.start_date, a.end_date
+    from tbl_activity a
+    join tbl_user u on a.owner = u.id
+    where a.name like '%' #{name} '%';
   </select>
 </mapper>

@@ -32,7 +32,7 @@ public interface ActivityService {
 
     List<Activity> queryActivityForBundByIds(String[] Ids);
 
-    List<Activity> queryActivityFroConvertByNameClueId(Map<String,Object> map);
+    List<Activity> queryActivityForConvertByNameClueId(Map<String,Object> map);
 
-
+    List<Activity> queryActivityForSaveTran(String name);
 }

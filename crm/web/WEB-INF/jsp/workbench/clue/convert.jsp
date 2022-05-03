@@ -52,7 +52,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		$("#searchActivityTxt").keyup(function (){
 			let activityName=this.value;
 			let clueId='${clue.id}';
-
+			alert(activityName);
 			//发送请求
 			$.ajax({
 				url:'workbench/clue/searchActivity.do',

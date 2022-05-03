@@ -14,4 +14,6 @@ public interface TransactionHistoryMapper {
     int updateByPrimaryKeySelective(TransactionHistory row);
 
     int updateByPrimaryKey(TransactionHistory row);
+
+    int insertTransactionHistory(TransactionHistory transactionHistory);
 }

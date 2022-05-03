@@ -84,6 +84,7 @@ public class QxController {
     @ResponseBody
     public Object queryUserByConditionForPage(String name,String deptno,String lockState,String startDateTime,
                                               String endDateTime,int pageNo,int pageSize){
+        System.out.println(lockState);
         Map<String, Object> map = new HashMap<>();
         map.put("name",name);
         map.put("deptno",deptno);

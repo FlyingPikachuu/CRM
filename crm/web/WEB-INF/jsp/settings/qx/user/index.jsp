@@ -129,7 +129,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			console.log(lockState);
 			let id=$(this).attr("userid");
 			if(lockState==1||lockState==null){
-				if(window.confirm("确定禁用该用户吗？")){
+				if(window.confirm("确定锁定该用户吗？")){
 					$.ajax({
 						url:'settings/qx/user/editLockState.do',
 						data:{
@@ -177,6 +177,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		let name = $("#query-name").val();
 		let deptno = $("#query-deptno").val();
 		let lockState = $("#query-lockState").val();
+		console.log(lockState);
 		let startDateTime = $("#query-startDateTime").val();
 		let endDateTime = $("#query-endDateTime").val();
 		// let pageNo=1;
@@ -214,7 +215,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					if(users.lockState==1||users.lockState==null){
 						htmlStr+="<td><a href='javascript:void(0);' id='editLockState' userId=\""+users.id+"\" userLockState=\""+users.lockState+"\" style='text-decoration: none;'>启用</a></td>"
 					}else {
-						htmlStr+="<td><a href='javascript:void(0);' id='editLockState' userId=\""+users.id+"\" userLockState=\""+users.lockState+"\" style='text-decoration: none;'>禁用</a></td>"
+						htmlStr+="<td><a href='javascript:void(0);' id='editLockState' userId=\""+users.id+"\" userLockState=\""+users.lockState+"\" style='text-decoration: none;'>锁定</a></td>"
 					}
 					htmlStr+="<td>"+users.createBy+"</td>"
 					htmlStr+="<td>"+users.createtime+"</td>"

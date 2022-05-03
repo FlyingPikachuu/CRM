@@ -13,6 +13,7 @@ import com.qsy.utils.ReturnInfoObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -117,8 +118,8 @@ public class ClueController {
         return  retMap;
     }
 
-    @RequestMapping("/workbench/clue/clueDetail.do")
-    public String clueDetail(String id, Model model){
+    @RequestMapping("/workbench/clue/clueDetail.do/{id}")
+    public String clueDetail(@PathVariable String id, Model model){
         List<ClueRemark> clueRemarkList = clueRemarkService.queryClueRemarkForDetailByClueId(id);
         Clue clue = cLueService.queryClueForDetailById(id);
         List<Activity> activityList = activityService.queryActivityForClueDetailByClueId(id);
@@ -214,7 +215,7 @@ public class ClueController {
         map.put("activityName",activityName);
         map.put("clueId",clueId);
 
-        List<Activity> activityList = activityService.queryActivityFroConvertByNameClueId(map);
+        List<Activity> activityList = activityService.queryActivityForConvertByNameClueId(map);
         System.out.println(activityList);
         return  activityList;
     }

@@ -204,7 +204,7 @@
       <if test="deptno!=null and deptno!=''">
         and u1.deptno like '%' #{deptno} '%'
       </if>
-      <if test="lock_state!=null">
+      <if test="lockState!=null">
         and u1.lock_state=#{lockState}
       </if>
       <if test="startDateTime!=null and startDateTime!=''">

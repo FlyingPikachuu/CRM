@@ -59,4 +59,14 @@ public class MyTest {
 
         System.out.println(Integer.parseInt(a));
     }
+
+    @Test
+    public void test5(){
+
+        HashMap<String, Object> m = new HashMap<>();
+        int a=1;
+        m.put("sum",a+1+1);
+        m.put("b",a);
+        System.out.println(m);
+    }
 }

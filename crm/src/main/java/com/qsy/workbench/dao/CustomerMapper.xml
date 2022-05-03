@@ -192,4 +192,15 @@
     values (#{id},#{ owner},#{ name},#{ website},#{ phone},#{ createBy},#{ createTime},#{
             contactSummary},#{ nextContactTime},#{ description},#{ address});
   </insert>
+  <select id="selectCustomerNameByName" parameterType="string" resultType="string">
+    select name
+    from tbl_customer
+    where name like '%' #{name} '%';
+  </select>
+
+  <select id="selectCustomerByName" parameterType="string" resultMap="BaseResultMap">
+    select  <include refid="Base_Column_List"/>
+    from tbl_customer
+    where name = #{name};
+  </select>
 </mapper>

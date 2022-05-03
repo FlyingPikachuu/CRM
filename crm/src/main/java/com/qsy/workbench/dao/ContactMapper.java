@@ -2,6 +2,8 @@ package com.qsy.workbench.dao;
 
 import com.qsy.workbench.pojo.Contact;
 
+import java.util.List;
+
 public interface ContactMapper {
     int deleteByPrimaryKey(String id);
 
@@ -17,4 +19,6 @@ public interface ContactMapper {
 
     //添加一条联系人记录
     int insertContact(Contact contact);
+
+    List<Contact> selectContactForSaveTran(String name);
 }

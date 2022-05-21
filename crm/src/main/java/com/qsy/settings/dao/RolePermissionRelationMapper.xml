@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qsy.settings.dao.RolePermissionRelationMapper">
+  <resultMap id="BaseResultMap" type="com.qsy.settings.pojo.RolePermissionRelation">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_id" jdbcType="VARCHAR" property="roleId" />
+    <result column="permission_id" jdbcType="VARCHAR" property="permissionId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, role_id, permission_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_role_permission_relation
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_role_permission_relation
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qsy.settings.pojo.RolePermissionRelation">
+    insert into tbl_role_permission_relation (id, role_id, permission_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{roleId,jdbcType=VARCHAR}, #{permissionId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qsy.settings.pojo.RolePermissionRelation">
+    insert into tbl_role_permission_relation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="roleId != null">
+        role_id,
+      </if>
+      <if test="permissionId != null">
+        permission_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null">
+        #{roleId,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionId != null">
+        #{permissionId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qsy.settings.pojo.RolePermissionRelation">
+    update tbl_role_permission_relation
+    <set>
+      <if test="roleId != null">
+        role_id = #{roleId,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionId != null">
+        permission_id = #{permissionId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qsy.settings.pojo.RolePermissionRelation">
+    update tbl_role_permission_relation
+    set role_id = #{roleId,jdbcType=VARCHAR},
+      permission_id = #{permissionId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectPidByRoleId" resultType="string" parameterType="string">
+    select permission_id
+    from tbl_role_permission_relation
+    where role_id = #{roleId};
+  </select>
+  <select id="selectRPRByRoleId" resultMap="BaseResultMap" parameterType="string">
+    select <include refid="Base_Column_List"></include>
+    from tbl_role_permission_relation
+    where role_id = #{roleId};
+  </select>
+  <insert id="insertRPR" parameterType="rolePermissionRelation">
+    insert into tbl_role_permission_relation (role_id, permission_id)
+    values (#{roleId},#{permissionId});
+  </insert>
+  <update id="updateRPRByRoleId" parameterType="rolePermissionRelation">
+    update tbl_role_permission_relation
+    set role_id = #{roleId},
+        permission_id = #{permissionId}
+        where role_id = #{roleId};
+  </update>
+  <select id="selectPidByRoleIds" parameterType="string" resultType="string">
+    select permission_id
+    from tbl_role_permission_relation
+    where role_id in
+    <foreach collection="array" item="roleId" open=" (" separator="," close=")">
+      #{roleId}
+    </foreach>
+  </select>
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qsy.settings.dao.DeptMapper">
+  <resultMap id="BaseResultMap" type="com.qsy.settings.pojo.Dept">
+    <id column="code" jdbcType="CHAR" property="code" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    code, name, description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_dept
+    where code = #{code,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tbl_dept
+    where code = #{code,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.qsy.settings.pojo.Dept">
+    insert into tbl_dept (code, name, description
+      )
+    values (#{code,jdbcType=CHAR}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qsy.settings.pojo.Dept">
+    insert into tbl_dept
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        code,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        #{code,jdbcType=CHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qsy.settings.pojo.Dept">
+    update tbl_dept
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where code = #{code,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qsy.settings.pojo.Dept">
+    update tbl_dept
+    set name = #{name,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR}
+    where code = #{code,jdbcType=CHAR}
+  </update>
+  <select id="selectAllDept" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_dept;
+  </select>
+  <insert id="insertDept" parameterType="dept">
+    insert into tbl_dept (code, name, description)
+    values (#{code},#{name},#{description});
+  </insert>
+  <update id="updateDeptByCode" parameterType="map">
+    update tbl_dept
+    set code = #{code},
+        name = #{name},
+        description = #{description}
+    where code = #{oldCode};
+  </update>
+  <delete id="deleteDeptByCode" parameterType="string">
+    delete
+    from tbl_dept
+    where code in
+    <foreach collection="array" item="code" open=" (" separator="," close=")">
+      #{code}
+    </foreach>
+  </delete>
+  <select id="selectDeptByCode" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_dept
+    where code = #{code};
+  </select>
+  <select id="selectDeptNameByName" parameterType="string" resultType="string">
+    select name
+    from tbl_dept
+    where name like '%' #{name} '%';
+  </select>
+  <select id="selectDeptByName" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_dept
+    where name = #{name};
+  </select>
+</mapper>

@@ -95,7 +95,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						//刷新备注列表
 						let htmlStr="";
 						htmlStr+="<div id=\"div_"+data.returnData.id+"\" class='remarkDiv' style='height: 60px;'>"
-						htmlStr+="<img title=\"${sessionScope.sessionUser.name}\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">";
+						htmlStr+="<img title=\"${sessionScope.userInfo.name}\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">";
 						htmlStr+="<div style='position: relative; top: -40px; left: 40px;' >";
 						htmlStr+="<h5>"+data.returnData.noteContent+"</h5>";
 						htmlStr+="<font color=\"gray\">市场活动</font> <font color=\"gray\">-</font> <b>${activity.name}</b> <small style=\"color: gray;\"> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}创建</small>";

@@ -7,7 +7,7 @@ import com.qsy.utils.IDUtils;
 import com.qsy.utils.ReturnInfoObject;
 import com.qsy.workbench.pojo.ClueRemark;
 import com.qsy.workbench.service.ActivityService;
-import com.qsy.workbench.service.CLueService;
+import com.qsy.workbench.service.ClueService;
 import com.qsy.workbench.service.ClueRemarkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
-import java.util.logging.ConsoleHandler;
 
 /**
  * @author qsy
@@ -28,7 +27,7 @@ public class ClueRemarkController {
     @Autowired
     private ClueRemarkService clueRemarkService;
     @Autowired
-    private CLueService cLueService;
+    private ClueService cLueService;
     @Autowired
     private ActivityService activityService;
 

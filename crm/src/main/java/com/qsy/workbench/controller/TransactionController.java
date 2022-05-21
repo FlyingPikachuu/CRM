@@ -6,17 +6,13 @@ import com.qsy.settings.service.DicValueService;
 import com.qsy.settings.service.UserService;
 import com.qsy.utils.Constants;
 import com.qsy.utils.ReturnInfoObject;
-import com.qsy.workbench.pojo.Activity;
-import com.qsy.workbench.pojo.Contact;
-import com.qsy.workbench.pojo.Transaction;
-import com.qsy.workbench.service.ActivityService;
-import com.qsy.workbench.service.ContactService;
-import com.qsy.workbench.service.CustomerService;
-import com.qsy.workbench.service.TransactionService;
+import com.qsy.workbench.pojo.*;
+import com.qsy.workbench.service.*;
 import org.junit.validator.PublicClassValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,6 +41,10 @@ public class TransactionController {
     private ActivityService activityService;
     @Autowired
     private ContactService contactService;
+    @Autowired
+    private TransactionHistoryService transactionHistoryService;
+    @Autowired
+    private TransactionRemarkService transactionRemarkService;
     @RequestMapping("/workbench/transaction/index.do")
     public String index(Model model){
         List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
@@ -146,7 +146,88 @@ public class TransactionController {
             returnInfoObject.setMessage("系统忙，请稍后重试···");
         }
         return  returnInfoObject;
+    }
+    @RequestMapping("/workbench/transaction/queryTransactionForDetailById.do/{id}")
+    public String queryTransactionForDetailById(@PathVariable String id,Model model){
+        Transaction ts = transactionService.queryTransactionForDetailById(id);
+        ResourceBundle bundle = ResourceBundle.getBundle("possibility");
+        String possibility = bundle.getString(ts.getStage());
+        ts.setPossibility(possibility);
+        List<TransactionRemark> trList = transactionRemarkService.queryTransactionRemarkForDetailByTranId(id);
+        List<TransactionHistory> thList = transactionHistoryService.queryTransactionHistoryForDetailByTranId(id);
+        List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
 
+        model.addAttribute("ts",ts);
+        model.addAttribute("trList",trList);
+        model.addAttribute("thList",thList);
+        model.addAttribute("stageList",stageList);
+        return "/workbench/transaction/detail";
     }
 
+    @RequestMapping("/workbench/transaction/toEdit.do/{id}")
+    public String toEdit(@PathVariable String id,Model model){
+        List<User> userList = userService.queryAllUser();
+        Transaction tran = transactionService.queryTranById(id);
+        ResourceBundle bundle = ResourceBundle.getBundle("possibility");
+        DicValue dicValue = dicValueService.queryDicValueById(tran.getStage());
+        String possibility = bundle.getString(dicValue.getValue());
+        tran.setPossibility(possibility);
+        List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
+        List<DicValue> typeList = dicValueService.queryDicValueByTypeCode("transactionType");
+        List<DicValue> sourceList = dicValueService.queryDicValueByTypeCode("source");
+
+        model.addAttribute("userList",userList);
+        model.addAttribute("stageList",stageList);
+        model.addAttribute("typeList",typeList);
+        model.addAttribute("sourceList",sourceList);
+        model.addAttribute("tran",tran);
+        return "/workbench/transaction/edit";
+    }
+
+    @RequestMapping("/workbench/transaction/editTran.do")
+    @ResponseBody
+    public Object editTran(@RequestParam Map<String,Object> map,HttpSession session){
+        map.put(Constants.SESSION_USER,session.getAttribute(Constants.SESSION_USER));
+        ReturnInfoObject returnInfoObject = new ReturnInfoObject();
+        try {
+            transactionService.editTransaction(map);
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+            returnInfoObject.setMessage("系统忙，请稍后重试···");
+        }
+        return returnInfoObject;
+    }
+    @RequestMapping("/workbench/transaction/deleteTranByIds.do")
+    @ResponseBody
+    public Object deleteTranByIds(String[] ids) {
+        ReturnInfoObject returnInfoObject = new ReturnInfoObject();
+        try {
+                transactionService.deleteTranByIds(ids);
+                returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+            returnInfoObject.setMessage("系统忙，请稍后重试···");
+        }
+        return returnInfoObject;
+    }
+
+    //点击交易阶段图表修改交易阶段，添加交易历史
+    @RequestMapping("/workbench/transaction/editTranStage.do")
+    @ResponseBody
+    public Object editTranStage(@RequestParam Map<String,Object> map,HttpSession session){
+        ReturnInfoObject returnInfoObject = new ReturnInfoObject();
+        map.put(Constants.SESSION_USER,session.getAttribute(Constants.SESSION_USER));
+        try {
+            transactionService.editTranStage(map);
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+            returnInfoObject.setMessage("系统忙，请稍后重试···");
+        }
+        return  returnInfoObject;
+    }
 }

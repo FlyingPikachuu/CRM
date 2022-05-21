@@ -119,4 +119,20 @@
     insert into tbl_tran_history (id, stage, money, expected_date, create_time, create_by, tran_id)
     values (#{id},#{ stage},#{ money},#{ expectedDate},#{ createTime},#{ createBy},#{ tranId});
   </insert>
+  <select id="selectTransactionHistoryForDetailByTranId" parameterType="string" resultMap="BaseResultMap">
+    select th.id, dv.value as stage, th.money, th.expected_date, th.create_time,u.name as create_by, th.tran_id
+    from tbl_tran_history th
+    join tbl_user u on th.create_by = u.id
+    join tbl_dic_value dv on th.stage = dv.id
+    where th.tran_id = #{tranId}
+    order by create_time desc;
+  </select>
+  <delete id="deleteTransactionHistoryByTranId" parameterType="string">
+    delete
+    from tbl_tran_history
+    where tran_id in
+    <foreach collection="array" item="tranId" open=" (" separator="," close=")">
+      #{tranId}
+    </foreach>
+  </delete>
 </mapper>

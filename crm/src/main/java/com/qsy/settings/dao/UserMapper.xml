@@ -15,13 +15,15 @@
     <result column="create_by" jdbcType="VARCHAR" property="createBy" />
     <result column="edit_time" jdbcType="CHAR" property="editTime" />
     <result column="edit_by" jdbcType="VARCHAR" property="editBy" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
+    <result column="dept_name" jdbcType="VARCHAR" property="deptName"/>
   </resultMap>
   <sql id="Base_Column_List">
-    id, login_act, name, login_pwd, email, expire_time, lock_state, deptno, allow_ips, 
+    id, login_act, name, login_pwd, email, expire_time, lock_state, deptno, roleno,allow_ips,
     createTime, create_by, edit_time, edit_by
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from tbl_user
     where id = #{id,jdbcType=CHAR}
@@ -31,15 +33,15 @@
     where id = #{id,jdbcType=CHAR}
   </delete>
   <insert id="insertUser" parameterType="com.qsy.settings.pojo.User">
-    insert into tbl_user (id, login_act, name, 
-      login_pwd, email, expire_time, 
-      lock_state, deptno, allow_ips, 
-      createTime, create_by, edit_time, 
+    insert into tbl_user (id, login_act, name,
+      login_pwd, email, expire_time,
+      lock_state, deptno, allow_ips,
+      createTime, create_by, edit_time,
       edit_by)
-    values (#{id,jdbcType=CHAR}, #{loginAct,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{loginPwd,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{expireTime,jdbcType=CHAR}, 
-      #{lockState,jdbcType=CHAR}, #{deptno,jdbcType=CHAR}, #{allowIps,jdbcType=VARCHAR}, 
-      #{createtime,jdbcType=CHAR}, #{createBy,jdbcType=VARCHAR}, #{editTime,jdbcType=CHAR}, 
+    values (#{id,jdbcType=CHAR}, #{loginAct,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+      #{loginPwd,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{expireTime,jdbcType=CHAR},
+      #{lockState,jdbcType=CHAR}, #{deptno,jdbcType=CHAR}, #{allowIps,jdbcType=VARCHAR},
+      #{createtime,jdbcType=CHAR}, #{createBy,jdbcType=VARCHAR}, #{editTime,jdbcType=CHAR},
       #{editBy,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.qsy.settings.pojo.User">
@@ -186,8 +188,11 @@
     where id = #{id,jdbcType=CHAR}
   </update>
   <select id="selectByLoginActAndLoginPwd" parameterType="map" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List"/>
-    from tbl_user where login_act = #{loginAct} and login_pwd =#{loginPwd};
+    select u.id, u.login_act, u.name, u.login_pwd, u.email, u.expire_time, u.lock_state, u.deptno, u.roleno, u.allow_ips, u.createTime, u.create_by, u.edit_time, u.edit_by,r.name as role_name,d.name as dept_name
+    from tbl_user u
+    join tbl_dept d on u.deptno = d.code
+    left join tbl_role r on u.roleno = r.code
+    where login_act = #{loginAct} and login_pwd =#{loginPwd};
   </select>
   <select id="selectAllUser" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"/>
@@ -195,14 +200,17 @@
   </select>
 
   <select id="selectUserByConditionForPage" parameterType="map" resultMap="BaseResultMap">
-    select u1.id, u1.login_act, u1.name, u1.login_pwd, u1.email, u1.expire_time, u1.lock_state, u1.deptno, u1.allow_ips, u1.createTime, u2.name as create_by, u1.edit_time, u1.edit_by
-    from tbl_user u1 join tbl_user u2 on u1.create_by=u2.id
+    select u1.id, u1.login_act, u1.name, u1.login_pwd, u1.email, u1.expire_time, u1.lock_state, d.name as deptno, u1.roleno,u1.allow_ips, u1.createTime, u2.name as create_by, u1.edit_time, u3.name as edit_by
+    from tbl_user u1
+    join tbl_user u2 on u1.create_by=u2.id
+    join tbl_dept d on u1.deptno = d.code
+    left join tbl_user u3 on u1.edit_by = u3.id
     <where>
       <if test="name!=null and name!=''">
         and u1.name like '%' #{name} '%'
       </if>
       <if test="deptno!=null and deptno!=''">
-        and u1.deptno like '%' #{deptno} '%'
+        and d.name like '%' #{deptno} '%'
       </if>
       <if test="lockState!=null">
         and u1.lock_state=#{lockState}
@@ -220,15 +228,18 @@
 
   <select id="selectCountOfUserByCondition" parameterType="map" resultType="_int">
     select count(*)
-    from tbl_user u1 join tbl_user u2 on u1.create_by=u2.id
+    from tbl_user u1
+    join tbl_user u2 on u1.create_by=u2.id
+    join tbl_dept d on u1.deptno = d.code
+    left join tbl_user u3 on u1.edit_by = u3.id
     <where>
       <if test="name!=null and name!=''">
         and u1.name like '%' #{name} '%'
       </if>
       <if test="deptno!=null and deptno!=''">
-        and u1.deptno like '%' #{deptno} '%'
+        and d.name like '%' #{deptno} '%'
       </if>
-      <if test="lock_state!=null">
+      <if test="lockState!=null">
         and u1.lock_state=#{lockState}
       </if>
       <if test="startDateTime!=null and startDateTime!=''">
@@ -242,6 +253,76 @@
   <update id="updateLockStateOfUserById" parameterType="map">
     update tbl_user
     set lock_state = #{lockState}
+    where id = #{id};
+  </update>
+  <select id="selectUserById" parameterType="string" resultMap="BaseResultMap">
+    select u.id, u.login_act, u.name, u.login_pwd, u.email, u.expire_time, u.lock_state, u.deptno, u.roleno, u.allow_ips, r.name as role_name,d.name as dept_name
+    from tbl_user u
+    left join tbl_role r on u.roleno = r.code
+    join tbl_dept d on u.deptno = d.code
+    where u.id = #{id};
+  </select>
+  <update id="updatePwdById" parameterType="map" >
+    update tbl_user
+    set login_pwd = #{newPwd}
+    where id = #{id};
+  </update>
+  <update id="updateUserDeptNoByCode" parameterType="string">
+    update tbl_user
+    set deptno = #{deptno}
+    where deptno = #{oldDeptno};
+  </update>
+  <delete id="deleteUserByDeptNO" parameterType="string">
+    delete
+    from tbl_user
+    where deptno in
+    <foreach collection="array" item="code" open=" (" separator="," close=")">
+      #{code}
+    </foreach>
+  </delete>
+  <update id="updateUserByRoleNo" parameterType="string">
+    update tbl_user
+    set roleno = #{code}
+    where roleno = #{oldCode};
+  </update>
+  <update id="updateRoleNoToNull" parameterType="string">
+    update tbl_user
+    set roleno = null
+    where roleno in
+    <foreach collection="array" item="code" open=" (" separator="," close=")">
+      #{code}
+    </foreach>
+  </update>
+  <update id="updateRoleNoByRoleNo" parameterType="string">
+    update tbl_user
+    set roleno = #{roleno}
+    where id = #{id};
+  </update>
+  <update id="updateRoleNoById" parameterType="string">
+    update tbl_user
+    set roleno = null
+    where id = #{id};
+  </update>
+  <update id="updateUserById" parameterType="user">
+    update tbl_user
+    set login_act = #{loginAct},
+        name = #{name},
+        login_pwd = #{loginPwd},
+        email = #{email},
+        expire_time = #{expireTime},
+        lock_state = #{lockState},
+        deptno = #{deptno},
+        allow_ips = #{allowIps},
+        edit_time = #{editTime},
+        edit_by = #{editBy}
+    where id = #{id};
+  </update>
+  <update id="updatePersonalInfoById" parameterType="user">
+    update tbl_user
+    set name = #{name},
+        email = #{email},
+        edit_time = #{editTime},
+        edit_by = #{editBy}
     where id = #{id};
   </update>
 </mapper>

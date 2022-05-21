@@ -364,4 +364,105 @@
     from tbl_clue
     where id = #{id};
   </delete>
+
+  <select id="selectClueById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_clue
+    where id = #{id};
+  </select>
+  <update id="updateClueById" parameterType="clue">
+    update tbl_clue
+    set fullname = #{fullname},
+        appellation = #{appellation},
+        owner = #{owner},
+        company = #{company},
+        job = #{job},
+        email = #{email},
+        phone = #{phone},
+        website = #{website},
+        mphone = #{mphone},
+        state = #{state},
+        source = #{source},
+        edit_by = #{editBy},
+        edit_time = #{editTime},
+        description = #{description},
+        contact_summary = #{contactSummary},
+        next_contact_time = #{nextContactTime},
+        address = #{address}
+    where id = #{id};
+  </update>
+  <delete id="deleteClueByIds" parameterType="string">
+    delete
+    from tbl_clue
+    where id in
+    <foreach collection="array" item="id" open=" (" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="selectCountOfClueBySource" resultType="funnelVO">
+    select count(*) as value,dv.value as name
+    from tbl_clue c
+    left join tbl_dic_value dv on c.source = dv.id 
+    group by source   ;
+  </select>
+  <select id="selectCountOfClueByState" resultType="funnelVO">
+    select count(*) as value,dv.value as name
+    from tbl_clue c
+           left join tbl_dic_value dv on c.state = dv.id
+    group by state   ;
+  </select>
+  <select id="selectCountOfClueByOwnerAndCreate" resultType="lBVO">
+    select u1.name as name ,count(*) as value
+    from tbl_clue c
+           join tbl_user u1 on c.owner =u1.id
+    where month(create_time)=month(CURDATE()) and c.state = '966170ead6fa481284b7d21f90364984'
+    group by c.owner
+    order by count(*)
+    limit 0,10;
+    </select>
+  <select id="selectCountOfClueByCreateMonth" resultType="lBVO">
+    SELECT MONTH(create_time) as name ,COUNT(*) as value
+    FROM tbl_clue
+    WHERE YEAR(CURDATE())=YEAR(create_time)
+    GROUP BY MONTH(create_time);
+  </select>
+  <select id="selectMaxOfCreateClueInAYear" resultType="int">
+    SELECT MAX(num) AS value
+    FROM (SELECT COUNT(*) AS num,groupTime,OWNER
+          FROM (SELECT id, create_time, OWNER, @groupTime:=DATE_FORMAT(create_time,'%Y-%m') AS groupTime
+                FROM tbl_clue) AS a
+          GROUP BY groupTime,OWNER)AS b
+    GROUP BY groupTime
+  </select>
+  <select id="selectCountOfClue" resultType="pieVO" parameterType="map">
+    SELECT a.num,b.sum FROM
+    (SELECT COUNT(*) AS num
+    FROM tbl_clue
+    <where>
+        state = '966170ead6fa481284b7d21f90364984'
+      <if test="startDate!=null and startDate!=''">
+        and create_time&gt;=#{startDate}
+      </if>
+      <if test="endDate!=null and endDate!=''">
+        and create_time&lt;=#{endDate}
+      </if>
+    </where> )AS a,(SELECT COUNT(*) AS SUM
+    FROM tbl_clue <include refid="main_query"></include>)AS b
+  </select>
+  <select id="selectCountOfNewClue" resultType="_int" parameterType="map">
+    select count(*)
+    from tbl_clue
+    <include refid="main_query"></include>
+  </select>
+  <sql id="main_query">
+    <where>
+      <if test="startDate!=null and startDate!=''">
+        and create_time&gt;=#{startDate}
+      </if>
+      <if test="endDate!=null and endDate!=''">
+        and create_time&lt;=#{endDate}
+      </if>
+    </where>
+  </sql>
 </mapper>

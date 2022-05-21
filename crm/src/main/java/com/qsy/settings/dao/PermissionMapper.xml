@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qsy.settings.dao.PermissionMapper">
+  <resultMap id="BaseResultMap" type="com.qsy.settings.pojo.Permission">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="p_id" jdbcType="INTEGER" property="pId" />
+    <result column="is_parent" jdbcType="INTEGER" property="isParent" />
+    <result column="open" jdbcType="INTEGER" property="open" />
+    <result column="checked" jdbcType="INTEGER" property="checked" />
+    <result column="module_url" jdbcType="VARCHAR" property="moduleUrl" />
+    <result column="do_url" jdbcType="VARCHAR" property="doUrl" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="target" jdbcType="VARCHAR" property="target" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, p_id, is_parent, open, checked, module_url, do_url, order_no, url, target
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_permission
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_permission
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.qsy.settings.pojo.Permission">
+    insert into tbl_permission (id, name, p_id, 
+      is_parent, open, checked, 
+      module_url, do_url, order_no, 
+      url, target)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{pId,jdbcType=INTEGER}, 
+      #{isParent,jdbcType=INTEGER}, #{open,jdbcType=INTEGER}, #{checked,jdbcType=INTEGER}, 
+      #{moduleUrl,jdbcType=VARCHAR}, #{doUrl,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, 
+      #{url,jdbcType=VARCHAR}, #{target,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.qsy.settings.pojo.Permission">
+    insert into tbl_permission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="pId != null">
+        p_id,
+      </if>
+      <if test="isParent != null">
+        is_parent,
+      </if>
+      <if test="open != null">
+        open,
+      </if>
+      <if test="checked != null">
+        checked,
+      </if>
+      <if test="moduleUrl != null">
+        module_url,
+      </if>
+      <if test="doUrl != null">
+        do_url,
+      </if>
+      <if test="orderNo != null">
+        order_no,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="target != null">
+        target,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pId != null">
+        #{pId,jdbcType=INTEGER},
+      </if>
+      <if test="isParent != null">
+        #{isParent,jdbcType=INTEGER},
+      </if>
+      <if test="open != null">
+        #{open,jdbcType=INTEGER},
+      </if>
+      <if test="checked != null">
+        #{checked,jdbcType=INTEGER},
+      </if>
+      <if test="moduleUrl != null">
+        #{moduleUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="doUrl != null">
+        #{doUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="target != null">
+        #{target,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qsy.settings.pojo.Permission">
+    update tbl_permission
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pId != null">
+        p_id = #{pId,jdbcType=INTEGER},
+      </if>
+      <if test="isParent != null">
+        is_parent = #{isParent,jdbcType=INTEGER},
+      </if>
+      <if test="open != null">
+        open = #{open,jdbcType=INTEGER},
+      </if>
+      <if test="checked != null">
+        checked = #{checked,jdbcType=INTEGER},
+      </if>
+      <if test="moduleUrl != null">
+        module_url = #{moduleUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="doUrl != null">
+        do_url = #{doUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null">
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="target != null">
+        target = #{target,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qsy.settings.pojo.Permission">
+    update tbl_permission
+    set name = #{name,jdbcType=VARCHAR},
+      p_id = #{pId,jdbcType=INTEGER},
+      is_parent = #{isParent,jdbcType=INTEGER},
+      open = #{open,jdbcType=INTEGER},
+      checked = #{checked,jdbcType=INTEGER},
+      module_url = #{moduleUrl,jdbcType=VARCHAR},
+      do_url = #{doUrl,jdbcType=VARCHAR},
+      order_no = #{orderNo,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      target = #{target,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectAllPermission" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_permission;
+  </select>
+  <select id="selectPermissionById" resultMap="BaseResultMap" parameterType="_int">
+    select <include refid="Base_Column_List"></include>
+    from tbl_permission
+    where id = #{id}
+  </select>
+  <select id="selectMaxId" parameterType="_int" resultType="_int">
+    select max(id)
+    from tbl_permission;
+  </select>
+  <insert id="insertPermission" parameterType="permission">
+    insert into tbl_permission (id, name, p_id, is_parent, open, checked, module_url, do_url, order_no, url, target)
+    values (#{id},#{ name},#{ pId},#{ isParent},#{ open},#{ checked},#{ moduleUrl},#{ doUrl},#{ orderNo},#{ url},#{ target});
+  </insert>
+  <update id="updatePermissionById" parameterType="permission">
+    update tbl_permission
+    set name = #{name},
+        p_id = #{pId},
+        is_parent = #{isParent},
+        module_url = #{moduleUrl},
+        do_url = #{doUrl}
+    where id= #{id};
+  </update>
+  <delete id="deletePermissionById" parameterType="string">
+    delete
+    from tbl_permission
+    where id = #{id};
+  </delete>
+  <select id="selectDoUrlListByIds" parameterType="string" resultType="string">
+    select do_url
+    from tbl_permission
+    where id in
+    <foreach collection="array" item="id" open=" (" separator="," close=")">
+         #{id}
+    </foreach>
+  </select>
+  <select id="selectNameListByIds" parameterType="string" resultType="string">
+    select name
+    from tbl_permission
+    where id in
+    <foreach collection="array" item="id" open=" (" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+
+  <select id="selectPermissionByIds" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_permission
+    where id in
+    <foreach collection="array" item="id" open=" (" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+</mapper>

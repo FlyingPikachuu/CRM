@@ -30,7 +30,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		//阶段选择后自动填写可能性
 		$("#create-stage").change(function (){
 			let stageValue = $("#create-stage option:selected").text();
-			alert(stageValue);
 			if(stageValue==''){
 				$("#create-possibility").val("");
 				return;
@@ -47,6 +46,12 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				}
 			})
 		})
+
+		$("#create-customerName").change(function (){
+			let customerName = $("#create-customerName").val();
+
+			$("#create-name").val(customerName+"-");
+		});
 
 		//市场活动源搜索添加单击事件
 		$("#searchActivityBtn").click(function (){
@@ -158,6 +163,27 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			}
 		});
 
+		//日历插件
+		$(".myDate").datetimepicker({
+			language:'zh-CN',//语言类型
+			format:'yyyy-mm-dd',//日期格式
+			minView:'month',//显示的最小时间
+			initialDate:new Date(),//初始时间
+			autoclose:true,//设置完时间后是否自动关闭
+			todayBtn:true,//设置是否显示"今天"按钮，默认false
+			clearBtn:true// 设置是否显示"清空"按钮 默认false
+		});
+		$(".nextDate").datetimepicker({
+			language:'zh-CN',//语言类型
+			format:'yyyy-mm-dd',//日期格式
+			minView:'month',//显示的最小时间
+			initialDate:new Date(),//初始时间
+			autoclose:true,//设置完时间后是否自动关闭
+			todayBtn:true,//设置是否显示"今天"按钮，默认false
+			clearBtn:true,// 设置是否显示"清空"按钮 默认false
+			pickerPosition:'top-right'
+		});
+
 		//给“保存交易”按钮添加单击事件
 		$("#saveTranBtn").click(function (){
 			//获取参数
@@ -165,7 +191,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			let money = $.trim($("#create-money").val());
 			let expectedDate = $("#create-expectedDate").val();
 			let customerName = $("#create-customerName").val();
-			let name = customerName+"-"+$("#create-name").val();
+			let name = $("#create-name").val();
 			let stage = $("#create-stage").val();
 			let type = $("#create-type").val();
 			let source = $("#create-source").val();
@@ -192,7 +218,10 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				alert("预计成交日期不为空！");
 				return;
 			}
-
+			if(stage==''){
+				alert("阶段不为空！")
+				return;
+			}
 			$.ajax({
 				url:'workbench/transaction/saveTransaction.do',
 				data:{
@@ -214,12 +243,17 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				datatype:'json',
 				success:function (data){
 					if(data.code=="1"){
-						window.location.href='workbench/transaction/index.do';
+						self.location=document.referrer;
 					}else {
 						alert(data.message);
 					}
 				}
 			})
+		});
+
+		//给“取消”按钮添加单击事件
+		$("#cancelBtn").click(function (){
+			window.history.back();
 		});
 	});
 </script>
@@ -330,15 +364,16 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		<h3>创建交易</h3>
 	  	<div style="position: relative; top: -40px; left: 70%;">
 			<button type="button" class="btn btn-primary" id="saveTranBtn">保存</button>
-			<button type="button" class="btn btn-default">取消</button>
+			<button type="button" class="btn btn-default" id="cancelBtn">取消</button>
 		</div>
 		<hr style="position: relative; top: -40px;">
 	</div>
 	<form class="form-horizontal" role="form" style="position: relative; top: -30px;">
 		<div class="form-group">
-			<label for="create-transactionOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
+			<label for="create-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<select class="form-control" id="create-transactionOwner">
+				<select class="form-control" id="create-owner">
+					<option value="none" selected disabled hidden>请选择选项</option>
 				 <c:forEach items="${userList}" var="ul">
 					 <option value="${ul.id}">${ul.name}</option>
 				 </c:forEach>
@@ -351,26 +386,26 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		</div>
 		
 		<div class="form-group">
-			<label for="create-name" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
-			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-name">
-			</div>
-			<label for="create-expectedDate" class="col-sm-2 control-label">预计成交日期<span style="font-size: 15px; color: red;">*</span></label>
-			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-expectedDate">
-			</div>
-		</div>
-		
-		<div class="form-group">
 			<label for="create-customerName" class="col-sm-2 control-label">客户名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="hidden" id="create-customerId">
 				<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
 			</div>
+			<label for="create-expectedDate" class="col-sm-2 control-label">预计成交日期<span style="font-size: 15px; color: red;">*</span></label>
+			<div class="col-sm-10" style="width: 300px;">
+				<input type="text" class="form-control myDate" id="create-expectedDate" readonly>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="create-name" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
+			<div class="col-sm-10" style="width: 300px;">
+				<input type="text" class="form-control" id="create-name">
+			</div>
 			<label for="create-stage" class="col-sm-2 control-label">阶段<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
 			  <select class="form-control" id="create-stage">
-			  	<option></option>
+				  <option value="none" selected disabled hidden>请选择选项</option>
 			  	<c:forEach items="${stageList}" var="stl">
 					<option value="${stl.id}">${stl.value}</option>
 				</c:forEach>
@@ -407,7 +442,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			<label for="create-activityName" class="col-sm-2 control-label">市场活动源&nbsp;&nbsp;<a href="javascript:void(0);" id="searchActivityBtn"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="hidden" id="create-activityId">
-				<input  type="text" class="form-control" id="create-activityName">
+				<input  type="text" class="form-control" id="create-activityName" readonly>
 			</div>
 		</div>
 		
@@ -415,7 +450,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			<label for="create-contactsName" class="col-sm-2 control-label">联系人名称&nbsp;&nbsp;<a href="javascript:void(0);" id="searchContactBtn"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
 				<input type="hidden" id="create-contactId">
-				<input type="text" class="form-control" id="create-contactsName">
+				<input type="text" class="form-control" id="create-contactsName" readonly>
 			</div>
 		</div>
 		
@@ -436,7 +471,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		<div class="form-group">
 			<label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="text" class="form-control" id="create-nextContactTime">
+				<input type="text" class="form-control nextDate" id="create-nextContactTime" readonly>
 			</div>
 		</div>
 		

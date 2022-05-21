@@ -2,6 +2,9 @@ package com.qsy.workbench.service.impl;
 
 import com.qsy.workbench.dao.ActivityMapper;
 import com.qsy.workbench.pojo.Activity;
+import com.qsy.workbench.pojo.FunnelVO;
+import com.qsy.workbench.pojo.LBVO;
+import com.qsy.workbench.pojo.PieVO;
 import com.qsy.workbench.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,5 +88,55 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> queryActivityForSaveTran(String name) {
         return activityMapper.selectActivityForSaveTran(name);
+    }
+
+    @Override
+    public List<Activity> queryActivityForContactDetailByContactId(String contactId) {
+        return activityMapper.selectActivityForContactDetailByContactId(contactId);
+    }
+
+    @Override
+    public List<Activity> queryActivityForDetailByNameExpContactId(Map<String, Object> map) {
+        return activityMapper.selectActivityForDetailByNameExpContactId(map);
+    }
+
+    @Override
+    public List<LBVO> queryActivityGroupByOwner(Map<String, Object> map) {
+        return activityMapper.selectActivityGroupByOwner(map);
+    }
+
+    @Override
+    public List<LBVO> queryCountOfActivityByCreateMonth() {
+        return activityMapper.selectCountOfActivityByCreateMonth();
+    }
+
+    @Override
+    public List<LBVO> queryCountOfActivityInProgressGroupByOwner() {
+        return activityMapper.selectCountOfActivityInProgressGroupByOwner();
+    }
+
+    @Override
+    public List<LBVO> queryCountOfActivityByOwnerAndCreate() {
+        return activityMapper.selectCountOfActivityByOwnerAndCreate();
+    }
+
+    @Override
+    public List<Integer> queryMaxOfCreateActivityInAYear() {
+        return activityMapper.selectMaxOfCreateActivityInAYear();
+    }
+
+    @Override
+    public PieVO queryCountOfRelationActivity(Map<String,Object> map) {
+        return activityMapper.selectCountOfRelationActivity(map);
+    }
+
+    @Override
+    public int queryCountOfNewActivity(Map<String, Object> map) {
+        return activityMapper.selectCountOfNewActivity(map);
+    }
+
+    @Override
+    public List<Activity> queryActivityByIds(String[] ids) {
+        return activityMapper.selectActivityByIds(ids);
     }
 }

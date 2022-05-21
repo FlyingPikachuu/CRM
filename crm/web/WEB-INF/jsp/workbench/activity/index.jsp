@@ -26,6 +26,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 <script type="text/javascript">
 
 	$(function(){
+		showBtn();
 		//给创建按钮添加单击事件
 		$("#createActivityBtn").click(function (){
 			//初始化
@@ -42,7 +43,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			let endDate=$("#create-endDate").val();
 			let cost=$.trim($("#create-cost").val());
 			let description=$.trim($("#create-description").val());
-
 			//表单验证 必填项
 			if(owner==""){
 				alert("所有者不能为空！");
@@ -155,12 +155,12 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		})
 
 		//给”删除“按钮加单击事件
-		$("#deleteActivityBtn").click(function (){
+		$("#activityBtnBox").on('click','#deleteActivityBtn',function (){
 			//收集参数
 			//获取列表中的所有被选中的checkbox 因为checkbox与id绑定
 			let checkedIds=$("#tBody input[type='checkbox']:checked");
 			if(checkedIds.size()==0){
-				alert("请选择要删除的市场获得");
+				alert("请选择要删除的市场活动");
 				return;
 			}
 			//confirm对话框是阻塞函数，不点就一直停在那，阻塞主，同意返回true，取消false
@@ -301,14 +301,45 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			})
 		})
 
-		$("#exportActivityAllBtn").click(function (){
+		$("#portBtnBox").on('click',"#exportActivityAllBtn",function (){
 			//发送同步请求
-			window.location.href="workbench/activity/exportQueryAllActivity.do";
+			window.location.href="workbench/activity/exportQueryAllActivity.do/all";
+			// $.ajax({
+			// 	url:'workbench/activity/exportQueryAllActivity.do',
+			// 	type:'post',
+			// 	datatype: "json"
+			// })
+		})
 
+		$("#portBtnBox").on('click',"#exportActivityXzBtn",function (){
+			let checkedIds=$("#tBody input[type='checkbox']:checked");
+			if(checkedIds.size()==0){
+				alert("请选择要删除的市场活动");
+				return;
+			}
+			let ids="";
+			$.each(checkedIds,function (){
+				//this 和 obj一样 从变量中取出元素放这俩里面
+				//一般只有一个属性值时，用this 简单
+				//!!!!!注意 这里拼接的ids要与controller方法中参数名相同
+				ids+=this.value+",";
+			});
+			//去除最后的&
+			ids=ids.substr(0,ids.length-1);
+			//发送请求
+			alert(ids);
+			//发送同步请求
+			window.location.href="workbench/activity/exportQueryAllActivity.do/"+ids;
+			// $.ajax({
+			// 	url:'workbench/activity/exportQueryAllActivity.do',
+			// 	type:'post',
+			// 	datatype: "json"
+			// })
 		})
 
 		//给上传按钮添加单击事件
-		$("#uploadActivityBtn").click(function (){
+		$("#portBtnBox").on('click',"#uploadActivityBtn",function (){
+			$("#activityFile").val("");
 			$("#importActivityModal").modal("show");
 		})
 		//给”导入”按钮加单击事件
@@ -398,7 +429,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				$.each(data.activityList, function (index, obj) {
 					htmlStr += "<tr class=\"active\">";
 					htmlStr += "<td><input type=\"checkbox\" value=\"" + obj.id + "\"/></td>";
-					htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/queryActivityDetail.do?id="+obj.id+"'\">" + obj.name + "</a></td>";
+					htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/activity/queryActivityDetail.do/"+obj.id+"'\">" + obj.name + "</a></td>";
 					htmlStr += "<td>" + obj.owner + "</td>";
 					htmlStr += "<td>" + obj.startDate + "</td>";
 					htmlStr += "<td>" + obj.endDate + "</td>";
@@ -447,6 +478,26 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				});
 			}
 		});
+	}
+	function showBtn(){
+		$.ajax({
+			url:'workbench/showMenu.do',
+			type:'post',
+			datatype:'json',
+			success:function (data){
+				if(data.includes("删除市场活动")){
+					let htmlStr ="";
+					htmlStr="<button type=\"button\" class=\"btn btn-danger\" id=\"deleteActivityBtn\"><span class=\"glyphicon glyphicon-minus\"></span> 删除</button>"
+					$("#activityBtnBox").append(htmlStr);
+				}
+				if(data.includes("导出市场活动")){
+					let htmlStr ="";
+					htmlStr+="<button id=\"exportActivityAllBtn\" type=\"button\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-export\"></span> 下载列表数据（批量导出）</button>"
+					htmlStr+="<button id=\"exportActivityXzBtn\" type=\"button\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-export\"></span> 下载列表数据（选择导出）</button>"
+					$("#portBtnBox").append(htmlStr);
+				}
+			}
+		})
 	}
 
 </script>
@@ -667,15 +718,15 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 5px;">
-				<div class="btn-group" style="position: relative; top: 18%;">
+				<div class="btn-group" style="position: relative; top: 18%;" id="activityBtnBox">
 				  <button type="button" class="btn btn-primary" id="createActivityBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" id="editActivityBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger" id="deleteActivityBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+<%--				  <button type="button" class="btn btn-danger" id="deleteActivityBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>--%>
 				</div>
-				<div class="btn-group" style="position: relative; top: 18%;">
+				<div class="btn-group" style="position: relative; top: 18%;" id="portBtnBox">
                     <button type="button" class="btn btn-default" id="uploadActivityBtn" ><span class="glyphicon glyphicon-import"></span> 上传列表数据（导入）</button>
-                    <button id="exportActivityAllBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（批量导出）</button>
-                    <button id="exportActivityXzBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（选择导出）</button>
+<%--                    <button id="exportActivityAllBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（批量导出）</button>--%>
+<%--                    <button id="exportActivityXzBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（选择导出）</button>--%>
                 </div>
 			</div>
 			<div style="position: relative;top: 10px;">

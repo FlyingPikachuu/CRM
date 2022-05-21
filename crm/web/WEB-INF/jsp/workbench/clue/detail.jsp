@@ -18,6 +18,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 	var cancelAndSaveBtnDefault = true;
 	
 	$(function(){
+		showBtn();
 
 		//阻止BootStrap框架默认回车键刷新表单，导致模态窗口关闭，页面内容消失的问题
 		$(document).keydown(function(event){
@@ -193,7 +194,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			$("#bundModal").modal("show");
 
 		});
-		//给添加备注的保存按钮添加单击事件
 
 		//给关联活动模态窗口搜索框添加键盘弹起事件
 		$("#activityNameInput").keyup(function (){
@@ -319,17 +319,32 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			}
 		});
 
-		$("#convertClueBtn").click(function (){
+		$("#convertDiv").on('click','#convertClueBtn',function (){
 			let id='${clue.id}';
 			window.location.href='workbench/clue/toConvert.do?id='+id;
 		});
 	});
+	function showBtn(){
+		$.ajax({
+			url:'workbench/showMenu.do',
+			type:'post',
+			datatype:'json',
+			success:function (data){
+				if(data.includes("线索转换")){
+					let htmlStr ="";
+					htmlStr="<button type=\"button\" class=\"btn btn-default\" id=\"convertClueBtn\"><span class=\"glyphicon glyphicon-retweet\"></span> 转换</button>"
+					$("#convertDiv").html(htmlStr);
+
+				}
+			}
+		})
+	}
 
 </script>
 
 </head>
 <body>
-<!-- 修改线索备注的模态窗口 -->
+	<!-- 修改线索备注的模态窗口 -->
 	<div class="modal fade" id="editRemarkModal" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 40%;">
 			<div class="modal-content">
@@ -423,10 +438,10 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 	<!-- 大标题 -->
 	<div style="position: relative; left: 40px; top: -30px;">
 		<div class="page-header">
-			<h3>${clue.fullname}${clue.appellation} <small>${clue.company}</small></h3>
+			<h3>${clue.fullname}${clue.appellation==null?"":clue.appellation} <small>${clue.company}</small></h3>
 		</div>
-		<div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;">
-			<button type="button" class="btn btn-default" id="convertClueBtn"><span class="glyphicon glyphicon-retweet"></span> 转换</button>
+		<div style="position: relative; height: 50px; width: 500px;  top: -72px; left: 700px;" id="convertDiv">
+<%--			<button type="button" class="btn btn-default" id="convertClueBtn"><span class="glyphicon glyphicon-retweet"></span> 转换</button>--%>
 			
 		</div>
 	</div>

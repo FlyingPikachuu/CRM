@@ -20,6 +20,10 @@
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="contact_summary" jdbcType="VARCHAR" property="contactSummary" />
     <result column="next_contact_time" jdbcType="CHAR" property="nextContactTime" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+    <result column="activity_name" jdbcType="VARCHAR" property="activityName"/>
+    <result column="fullname" jdbcType="VARCHAR" property="contactName"/>
+
   </resultMap>
   <sql id="Base_Column_List">
     id, owner, money, name, expected_date, customer_id, stage, type, source, activity_id, 
@@ -324,4 +328,166 @@
       </if>
     </where>
   </select>
+
+  <select id="selectTransactionForDetailById" parameterType="string" resultMap="BaseResultMap">
+    select t.id, u1.name as owner, t.money, t.name, t.expected_date, cu.name as customer_id, dv1.value as stage, dv2.value as type, dv3.value as source, a.name as activity_id, co.fullname as contact_id, u2.name as create_by, t.create_time, u3.name as edit_by, t.edit_time, t.description, t.contact_summary, t.next_contact_time,dv1.order_no
+    from tbl_tran t
+     join tbl_user u1 on t.owner = u1.id
+     join tbl_user u2 on t.create_by = u2.id
+     left join tbl_user u3 on t.edit_by = u3.id
+     left join tbl_activity a on t.activity_id = a.id
+     join tbl_customer cu on t.customer_id = cu.id
+     left join tbl_contact co on t.contact_id = co.id
+     join tbl_dic_value dv1 on t.stage=dv1.id
+     left join tbl_dic_value dv2 on t.type=dv2.id
+     left join tbl_dic_value dv3 on t.source=dv3.id
+    where t.id = #{id};
+  </select>
+
+  <select id="selectCountOfTranGroupByStage" resultType="funnelVO" parameterType="map">
+    select count(*) as value, coalesce(dv.value,'未知') as name
+    from tbl_tran t
+    join tbl_dic_value dv on t.stage = dv.id
+    <include refid="main_query"></include>
+    group by stage;
+  </select>
+  
+  <select id="selectTranById" parameterType="string" resultMap="BaseResultMap">
+    select t.id,t.owner,t.money,t.name,t.expected_date,c.name as customer_id,t.stage,t.type,t.source,a.name as activity_name,t.activity_id,cot.fullname,t.contact_id,t.create_by,t.create_time,t.description,t.contact_summary,t.next_contact_time
+    from tbl_tran t
+    join tbl_customer c on t.customer_id = c.id
+    left join tbl_activity a on t.activity_id = a.id
+    left join tbl_contact cot on t.contact_id = cot.id
+    where t.id = #{id}
+  </select>
+  
+  <update id="updateTranById" parameterType="transaction" >
+    update tbl_tran
+    set owner = #{owner},
+        money = #{money},
+        name = #{name},
+        expected_date = #{expectedDate},
+        customer_id = #{customerId},
+        stage = #{stage},
+        type = #{type},
+        source = #{source},
+        activity_id = #{activityId},
+        contact_id = #{contactId},
+        edit_by = #{editBy},
+        edit_time = #{editTime},
+        description = #{description},
+        contact_summary = #{contactSummary},
+        next_contact_time = #{nextContactTime}
+    where id = #{id};
+  </update>
+  <delete id="deleteTranByIds" parameterType="string">
+    delete
+    from tbl_tran
+    where id in
+      <foreach collection="array" item="id"
+               open=" (" separator="," close=")" nullable="true">
+        #{id}
+      </foreach>
+  </delete>
+  <select id="selectTranByContactId" parameterType="string" resultMap="BaseResultMap">
+    select t.id,t.name,t.money,dv1.value as stage,t.expected_date,dv2.value as type
+    from tbl_tran t
+    join tbl_dic_value dv1 on t.stage = dv1.id
+    left join tbl_dic_value dv2 on t.type = dv2.id
+    where t.contact_id = #{contactId};
+  </select>
+  <select id="selectTranByCustomerId" parameterType="string" resultMap="BaseResultMap">
+    select t.id,t.name,t.money,dv1.value as stage,t.expected_date,dv2.value as type
+    from tbl_tran t
+           join tbl_dic_value dv1 on t.stage = dv1.id
+           left join tbl_dic_value dv2 on t.type = dv2.id
+    where t.customer_id = #{customerId};
+  </select>
+  <update id="updateTransactionByContactId" parameterType="string">
+    update tbl_tran
+    set contact_id = null
+    where contact_id in
+    <foreach collection="array" item="contactId" open=" (" close=")" separator=",">
+      #{contactId}
+    </foreach>
+  </update>
+  <update id="deleteTransactionByCustomerId" parameterType="string">
+    delete
+    from tbl_tran
+    where customer_id in
+    <foreach collection="array" item="customerId" open=" (" close=")" separator=",">
+      #{customerId}
+    </foreach>
+  </update>
+  <select id="selectCountOfTranAndSumMoneyGroupByCut" resultType="lBVO">
+    SELECT a.money as value2,b.value as value,a.name as name
+    FROM  (SELECT COUNT(*) AS VALUE,SUM(money) AS money ,c.name AS NAME
+           FROM tbl_tran t
+                  JOIN tbl_customer c ON t.customer_id =c.id
+           WHERE stage='29805c804dd94974b568cfc9017b2e4c'
+           GROUP BY t.customer_id) AS a,
+          (SELECT COUNT(*) AS VALUE,c.name AS NAME
+           FROM tbl_tran t
+                  JOIN tbl_customer c ON t.customer_id =c.id
+           WHERE t.customer_id IN ( SELECT customer_id FROM tbl_tran
+                                    WHERE stage='29805c804dd94974b568cfc9017b2e4c')
+           GROUP BY t.customer_id
+          ) AS b
+    WHERE a.name = b.name
+    ORDER BY a.money
+  </select>
+  <select id="selectCountOfTranByCreateMonth" resultType="lBVO">
+    SELECT DISTINCT a.name AS NAME,a.value AS VALUE,COALESCE(b.value,0) AS value2 FROM
+      (SELECT MONTH(create_time) AS NAME ,COUNT(*) AS VALUE
+       FROM tbl_tran
+       WHERE YEAR(CURDATE())=YEAR(create_time)
+       GROUP BY MONTH(create_time)) AS a LEFT JOIN (SELECT MONTH(create_time) AS NAME ,COUNT(*) AS VALUE
+                                                    FROM tbl_tran
+                                                    WHERE YEAR(CURDATE())=YEAR(create_time) AND stage = '29805c804dd94974b568cfc9017b2e4c'
+                                                    GROUP BY MONTH(create_time)) AS b ON a.name=b.name
+    ORDER BY a.name
+
+  </select>
+  <select id="selectSumMoneyGroupByOwner" resultType="lBVO">
+    SELECT SUM(t.money) AS value,u.name AS name
+    FROM tbl_tran t
+           JOIN tbl_user u ON t.owner = u.id
+    WHERE stage='29805c804dd94974b568cfc9017b2e4c'
+    GROUP BY t.owner
+    ORDER BY value;
+  </select>
+
+  <select id="selectCountOfTran" resultType="pieVO" parameterType="map">
+    SELECT a.num,b.sum FROM
+   (SELECT COUNT(*) AS num
+    FROM tbl_tran
+    WHERE  stage='29805c804dd94974b568cfc9017b2e4c'
+    <if test="startDate!=null and startDate!=''">
+      and create_time&gt;=#{startDate}
+    </if>
+    <if test="endDate!=null and endDate!=''">
+      and create_time&lt;=#{endDate}
+    </if>   )AS a,(SELECT COUNT(*) AS SUM
+    FROM tbl_tran <include refid="main_query"></include>)AS b
+  </select>
+  <select id="selectCountOfNewTran" resultType="_int" parameterType="map">
+    select count(*)
+    from tbl_tran
+    <include refid="main_query"></include>
+  </select>
+  <update id="updateTranByStage" parameterType="map">
+    update tbl_tran
+    set stage = #{stage}
+    where id = #{id};
+  </update>
+  <sql id="main_query">
+    <where>
+      <if test="startDate!=null and startDate!=''">
+        and create_time&gt;=#{startDate}
+      </if>
+      <if test="endDate!=null and endDate!=''">
+        and create_time&lt;=#{endDate}
+      </if>
+    </where>
+  </sql>
 </mapper>

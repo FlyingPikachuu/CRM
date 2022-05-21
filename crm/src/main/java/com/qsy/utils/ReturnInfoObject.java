@@ -13,4 +13,7 @@ public class ReturnInfoObject {
     private String code;//处理成功或失败的标记
     private String message;//提示信息
     private Object returnData;//返回的其他数据
+    private Object returnData2;
+    private Object returnData3;
+
 }

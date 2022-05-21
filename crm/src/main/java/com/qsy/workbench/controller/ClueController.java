@@ -29,7 +29,7 @@ import java.util.*;
 public class ClueController {
 
     @Autowired
-    private CLueService cLueService;
+    private ClueService clueService;
 
     @Autowired
     private UserService userService;
@@ -76,7 +76,7 @@ public class ClueController {
 
 
         try {
-            int ret = cLueService.addClue(clue);
+            int ret = clueService.addClue(clue);
             if(ret>0){
                 returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
             }
@@ -108,8 +108,8 @@ public class ClueController {
         map.put("beginNo",(pageNo-1)*pageSize);
         map.put("pageSize",pageSize);
 
-        List<Clue> clueList = cLueService.queryClueForPageByCondition(map);
-        int totalRows = cLueService.queryCountOfClueByCondition(map);
+        List<Clue> clueList = clueService.queryClueForPageByCondition(map);
+        int totalRows = clueService.queryCountOfClueByCondition(map);
 
         Map<String, Object> retMap = new HashMap<>();
         retMap.put("clueList",clueList);
@@ -118,10 +118,56 @@ public class ClueController {
         return  retMap;
     }
 
+    //查询指定联系人信息
+    @RequestMapping("/workbench/clue/queryClueByIdForEdit.do")
+    @ResponseBody
+    public Object queryClueByIdForEdit(String id){
+        Clue clue = clueService.queryClueById(id);
+        return clue;
+    }
+
+    @RequestMapping("/workbench/clue/editClue.do")
+    @ResponseBody
+    public  Object editClue(Clue clue, HttpSession session){
+        User user = (User)session.getAttribute(Constants.SESSION_USER);
+        clue.setEditBy(user.getId());
+        clue.setEditTime(DateUtils.formatDateTime(new Date()));
+        ReturnInfoObject returnInfoObject = new ReturnInfoObject();
+        try {
+            int ret = clueService.editClueById(clue);
+            if(ret>0){
+                returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+            }else{
+                returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+                returnInfoObject.setMessage("系统忙，请重试···");
+            }
+        } catch (Exception e) {
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+            returnInfoObject.setMessage("系统忙，请重试···");
+        }
+        return returnInfoObject;
+    }
+
+    //删除联系人
+    @RequestMapping("/workbench/clue/deleteClue.do")
+    @ResponseBody
+    public Object deleteClue(String[] ids){
+        ReturnInfoObject returnInfoObject = new ReturnInfoObject();
+        try {
+            clueService.deleteClue(ids);
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+        } catch (Exception e) {
+            e.printStackTrace();
+            returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+            returnInfoObject.setMessage("系统忙，请稍后重试···");
+        }
+        return  returnInfoObject;
+    }
+    
     @RequestMapping("/workbench/clue/clueDetail.do/{id}")
     public String clueDetail(@PathVariable String id, Model model){
         List<ClueRemark> clueRemarkList = clueRemarkService.queryClueRemarkForDetailByClueId(id);
-        Clue clue = cLueService.queryClueForDetailById(id);
+        Clue clue = clueService.queryClueForDetailById(id);
         List<Activity> activityList = activityService.queryActivityForClueDetailByClueId(id);
 
         model.addAttribute("clue",clue);
@@ -199,7 +245,7 @@ public class ClueController {
     }
     @RequestMapping("/workbench/clue/toConvert.do")
     public String toConvert(String id,Model model){
-        Clue clue = cLueService.queryClueForDetailById(id);
+        Clue clue = clueService.queryClueForDetailById(id);
         List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
 
         model.addAttribute("clue",clue);
@@ -227,7 +273,7 @@ public class ClueController {
         map.put(Constants.SESSION_USER,session.getAttribute(Constants.SESSION_USER));
 
         try {
-            cLueService.saveConvertClue(map);
+            clueService.saveConvertClue(map);
             returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
         } catch (Exception e) {
             e.printStackTrace();

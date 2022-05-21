@@ -126,11 +126,44 @@
     where id = #{id,jdbcType=CHAR}
   </update>
 
-  <insert id="insertTransactionRemark" parameterType="list">
+  <insert id="insertTransactionRemarkByList" parameterType="list">
     insert into tbl_tran_remark (id, note_content, create_by, create_time, edit_by, edit_time, edit_flag, tran_id)
     values
     <foreach collection="list" item="trList" separator=",">
       (#{trList.id},#{ trList.noteContent},#{ trList.createBy},#{ trList.createTime},#{ trList.editBy},#{ trList.editTime},#{ trList.editFlag},#{ trList.tranId})
     </foreach>
   </insert>
+  <select id="selectTransactionRemarkForDetailByTranId" parameterType="string" resultMap="BaseResultMap">
+    select tr.id, tr.note_content, u1.name as create_by, tr.create_time, u2.name as edit_by, tr.edit_time, tr.edit_flag, tr.tran_id
+    from tbl_tran_remark tr
+    join tbl_user u1 on tr.create_by = u1.id
+    left join tbl_user u2 on tr.edit_by = u2.id
+    where tr.tran_id = #{tranId}
+    order by tr.create_time desc;
+  </select>
+  <insert id="insertTransactionRemark" parameterType="transactionRemark">
+    insert into tbl_tran_remark (id, note_content, create_by, create_time, edit_flag, tran_id)
+    values (#{id},#{ noteContent},#{ createBy},#{ createTime},#{ editFlag},#{ tranId});
+  </insert>
+  <delete id="deleteTransactionRemarkById" parameterType="string">
+    delete
+    from tbl_tran_remark
+    where id = #{id};
+  </delete>
+  <update id="updateTransactionRemark" parameterType="transactionRemark">
+    update tbl_tran_remark
+    set note_content = #{noteContent},
+        edit_by = #{editBy},
+        edit_time = #{editTime},
+        edit_flag = #{editFlag}
+    where id = #{id};
+  </update>
+  <delete id="deleteTransactionRemarkByTranId" parameterType="string">
+    delete
+    from tbl_tran_remark
+    where tran_id in
+    <foreach collection="array" item="tranId" open=" (" separator="," close=")">
+      #{tranId}
+    </foreach>;
+  </delete>
 </mapper>

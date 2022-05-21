@@ -96,4 +96,68 @@
     where type_code = #{typeCode}
     order by order_no asc
   </select>
+  <select id="selectDicValueForPageByCondition" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_dic_value
+    <where>
+      <if test="value!=null and value!=''">
+        and value like '%' #{value} '%'
+      </if>
+      <if test="typeCode!=null and typeCode!=''">
+      and type_code = #{typeCode}
+      </if>
+    </where>
+    order by order_no asc
+    limit #{beginNo},#{pageSize};
+  </select>
+  <select id="selectCountOfDicValueByCondition" parameterType="map" resultType="_int">
+    select count(*)
+    from tbl_dic_value
+    <where>
+      <if test="value!=null and value!=''">
+        and value like '%' #{value} '%'
+      </if>
+      <if test="typeCode!=null and typeCode!=''">
+        and type_code = #{typeCode}
+      </if>
+    </where>
+  </select>
+  <insert id="insertDicValue" parameterType="dicValue">
+    insert into tbl_dic_value (id, value, text, order_no, type_code)
+    values (#{id},#{value},#{text},#{orderNo},#{typeCode});
+  </insert>
+  <select id="selectDicValueById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_dic_value
+    where id = #{id};
+  </select>
+  <update id="updateDicValue" parameterType="dicValue">
+    update tbl_dic_value
+    set value = #{value},
+        text  = #{text},
+        order_no = #{orderNo},
+        type_code = #{typeCode}
+        where id = #{id};
+  </update>
+  <delete id="deleteDicValueById" parameterType="string">
+    delete
+    from tbl_dic_value
+    where id in
+    <foreach collection="array" item="id" open=" (" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+  <delete id="deleteDicValueByTypeCode" parameterType="string">
+    delete
+    from tbl_dic_value
+    where type_code in
+    <foreach collection="array" item="typeCode" open=" (" separator="," close=")">
+      #{typeCode}
+    </foreach>
+  </delete>
+  <select id="selectDicValueByTypeCodeAndOrderNo" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_dic_value
+    where type_code = #{typeCode} and order_no = #{orderNo};
+  </select>
 </mapper>

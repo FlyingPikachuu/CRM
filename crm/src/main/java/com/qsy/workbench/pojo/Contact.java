@@ -19,6 +19,16 @@ public class Contact {
 
     private String job;
 
+    private String birth;
+
+    public String getBirth() {
+        return birth;
+    }
+
+    public void setBirth(String birth) {
+        this.birth = birth;
+    }
+
     private String createBy;
 
     private String createTime;
@@ -34,6 +44,16 @@ public class Contact {
     private String nextContactTime;
 
     private String address;
+
+    private String ownerName;
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
 
     public String getId() {
         return id;

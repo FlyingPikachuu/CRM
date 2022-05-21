@@ -126,7 +126,7 @@
     where id = #{id,jdbcType=CHAR}
   </update>
 
-  <insert id="insertContactRemark" parameterType="list">
+  <insert id="insertContactRemarkByList" parameterType="contactRemark">
     insert into tbl_contact_remark (id, note_content, create_by, create_time, edit_by, edit_time, edit_flag,
                                     contact_id)
     values
@@ -134,4 +134,35 @@
       (#{corList.id},#{ corList.noteContent},#{ corList.createBy},#{ corList.createTime},#{ corList.editBy},#{ corList.editTime},#{ corList.editFlag},#{corList.contactId})
     </foreach>
   </insert>
+  <select id="selectContactRemarkForDetailByContactId" parameterType="string" resultMap="BaseResultMap">
+    select cr.id,cr.note_content,cr.create_time,u1.name as create_by,u2.name as edit_by,cr.edit_time,cr.edit_flag,cr.contact_id
+    from tbl_contact_remark cr
+           join tbl_user u1 on cr.create_by=u1.id
+           left join tbl_user u2 on cr.edit_by=u2.id
+    where cr.contact_id = #{contactId}
+    order by cr.create_time desc;
+  </select>
+
+  <insert id="insertContactRemark" parameterType="contactRemark">
+    insert into tbl_contact_remark (id, note_content, create_by, create_time, edit_flag, contact_id)
+    values (#{id},#{ noteContent},#{ createBy},#{ createTime},#{ editFlag},#{ contactId});
+  </insert>
+  <update id="updateContactRemark" parameterType="contactRemark">
+    update tbl_contact_remark
+    set note_content = #{noteContent},edit_by = #{editBy},edit_flag = #{editFlag},edit_time = #{editTime}
+    where id=#{id};
+  </update>
+  <delete id="deleteContactRemarkById" parameterType="string">
+    delete
+    from tbl_contact_remark
+    where id = #{id};
+  </delete>
+  <delete id="deleteContactRemarkByContactId" parameterType="string">
+    delete
+    from tbl_contact_remark
+    where contact_id in
+    <foreach collection="array" item="contactId" open=" (" close=")" separator=",">
+      #{contactId}
+    </foreach>
+  </delete>
 </mapper>

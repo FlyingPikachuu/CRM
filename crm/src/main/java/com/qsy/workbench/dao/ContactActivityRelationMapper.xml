@@ -68,11 +68,26 @@
       activity_id = #{activityId,jdbcType=CHAR}
     where id = #{id,jdbcType=CHAR}
   </update>
-  <insert id="insertContactActivityRelation" parameterType="list">
+  <insert id="insertContactActivityRelation" parameterType="contactActivityRelation">
     insert into tbl_contact_activity_relation (id, contact_id, activity_id)
     values
     <foreach collection="list" item="carList" separator=",">
       (#{carList.id}, #{carList.contactId}, #{carList.activityId})
     </foreach>
   </insert>
+
+  <delete id="deleteContactActivityRelationByActivityIdContactId" parameterType="contactActivityRelation">
+    delete
+    from tbl_contact_activity_relation
+    where activity_id=#{activityId} and contact_id =#{contactId};
+  </delete>
+
+  <delete id="deleteContactActivityRelationByContactId" parameterType="string">
+    delete
+    from tbl_contact_activity_relation
+    where contact_id in
+    <foreach collection="array" item="contactId" separator="," open=" (" close=")">
+      #{contactId}
+    </foreach>
+  </delete>
 </mapper>

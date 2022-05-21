@@ -27,6 +27,53 @@ public class User {
 
     private String editBy;
 
+    private String roleno;
+
+    private String deptName;
+    private  String roleName;
+    private  String lockStateName;
+    private String loginTime;
+
+    public String getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(String loginTime) {
+        this.loginTime = loginTime;
+    }
+
+    public String getLockStateName() {
+        return lockStateName;
+    }
+
+    public void setLockStateName(String lockStateName) {
+        this.lockStateName = lockStateName;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getRoleno() {
+        return roleno;
+    }
+
+    public void setRoleno(String roleno) {
+        this.roleno = roleno;
+    }
+
     public String getId() {
         return id;
     }

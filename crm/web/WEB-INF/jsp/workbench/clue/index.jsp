@@ -23,7 +23,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 <script type="text/javascript">
 
 	$(function(){
-		
+		showBtn();
 		//给线索“创建”按钮添加单击事件
 		$("#createClueBtn").click(function (){
 			//初始化模态窗口表单
@@ -113,11 +113,15 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					else{
 						//提示信息
 						alert(data.message);
-						
 						//显示模态窗口
 						$("#createClueModal").modal("show");
 					}
 				}
+				// ,
+				// error:function (){
+				// 	alert("您没有权限！");
+				// 	$("#createClueModal").modal("hide");
+				// }
 			})
 		})
 
@@ -142,8 +146,134 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		$("#queryClueBtn").click(function (){
 			queryClueForPageByCondition(1,$("#clue_pag").bs_pagination("getOption","rowsPerPage"));
 		});
+		
+		//给“修改”按钮添加单击事件
+		$("#editClueBtn").click(function (){
+			let checkedIds = $("#clueTbody input[type='checkbox']:checked");
+			if(checkedIds.size()==0){
+				alert("请选择要修改的市场活动");
+				return;
+			}
+			if(checkedIds.size()>1){
+				alert("每次只能修改一条市场活动");
+				return;
+			}
+			// 取dom对象属性值三种方法
+			// let id=checkedIds.val();
+			// let id=checkedIds.get(0).value;
+			let id=checkedIds[0].value;
+			$.ajax({
+				url:'workbench/clue/queryClueByIdForEdit.do',
+				data:{
+					id:id
+				},
+				type:'post',
+				datatype:'json',
+				success:function (data){
+					$("#edit-id").val(data.id);
+					$("#edit-fullname").val(data.fullname);
+					$("#edit-appellation").val(data.appellation);
+					$("#edit-owner").val(data.owner);
+					$("#edit-company").val(data.company);
+					$("#edit-job").val(data.job);
+					$("#edit-email").val(data.email);
+					$("#edit-phone").val(data.phone);
+					$("#edit-website").val(data.website);
+					$("#edit-mphone").val(data.mphone);
+					$("#edit-state").val(data.state);
+					$("#edit-source").val(data.source);
+					$("#edit-description").val(data.description);
+					$("#edit-contactSummary").val(data.contactSummary);
+					$("#edit-nextContactTime").val(data.nextContactTime);
+					$("#edit-address").val(data.address);
 
+					$("#editClueModal").modal("show");
+				}
+			})
+		});
+		//给“更新”按钮添加单击事件
+		$("#updateClueBtn").click(function (){
+			let id = $("#edit-id").val();
+			let fullname =$.trim($("#edit-fullname").val());
+			let appellation =$("#edit-appellation").val();
+			let owner =$("#edit-owner").val();
+			let company =$.trim($("#edit-company").val());
+			let job =$.trim($("#edit-job").val());
+			let email =$.trim($("#edit-email").val());
+			let phone =$.trim($("#edit-phone").val());
+			let website =$.trim($("#edit-website").val());
+			let mphone =$.trim($("#edit-mphone").val());
+			let state =$("#edit-state").val();
+			let source =$("#edit-source").val();
+			let description =$.trim($("#edit-description").val());
+			let contactSummary =$.trim($("#edit-contactSummary").val());
+			let nextContactTime =$.trim($("#edit-nextContactTime").val());
+			let address = $.trim($("#edit-address").val());
 
+			$.ajax({
+				url:'workbench/clue/editClue.do',
+				data:{
+					id :id,
+					fullname:fullname,
+					appellation:appellation,
+					owner :owner ,
+					company :company ,
+					job :job ,
+					email :email ,
+					phone :phone ,
+					website:website,
+					mphone:mphone,
+					state :state ,
+					source :source ,
+					description :description ,
+					contactSummary:contactSummary,
+					nextContactTime:nextContactTime,
+					address :address
+				},
+				type:'post',
+				datatype:'json',
+				success:function (data){
+					if(data.code=="1"){
+						$("#editClueModal").modal("hide");
+						queryClueForPageByCondition($("#clue_pag").bs_pagination("getOption","currentPage"),$("#clue_pag").bs_pagination("getOption","rowsPerPage"))
+					}else{
+						alert(data.message);
+						$("#editClueModal").modal("show");
+					}
+				}
+			})
+		});
+		
+		//给“删除”按钮添加单击事件
+		$("#clueBtnBox").on('click','#deleteClueBtn',function (){
+			let checkedIds = $("#clueTbody input[type='checkbox']:checked");
+			if(checkedIds.size()==0){
+				alert("请选择要删除的联系人");
+				return;
+			}
+			if(window.confirm("确定删除吗？")){
+				let ids="";
+				$.each(checkedIds,function (){
+					ids+="ids="+this.value+"&";
+				})
+				//去除最后一个&
+				ids = ids.substr(0,ids.length-1);
+				$.ajax({
+					url:'workbench/clue/deleteClue.do',
+					data:ids,
+					type:'post',
+					datatype:'json',
+					success:function (data){
+						if(data.code=="1"){
+							queryClueForPageByCondition($("#clue_pag").bs_pagination("getOption","currentPage"),$("#clue_pag").bs_pagination("getOption","rowsPerPage"));
+						}else{
+							alert(data.message);
+						}
+					}
+				})
+			}
+
+		});
 	});
 	function queryClueForPageByCondition(pageNo,pageSize){
 		//收集参数
@@ -178,8 +308,12 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				let htmlStr = "";
 				$.each(data.clueList, function (index, obj) {
 					htmlStr += "<tr>"
-					htmlStr += "<td><input type=\"checkbox\" /></td>"
-					htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/clue/clueDetail.do/"+obj.id+"';\">" + obj.fullname + "" + obj.appellation + "</a></td>"
+					htmlStr += "<td><input value='"+obj.id+"' type=\"checkbox\" /></td>"
+					if(data.appellation==""||data.appellation==null){
+						htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/clue/clueDetail.do/"+obj.id+"';\">" + obj.fullname + "</a></td>"
+					}else{
+						htmlStr += "<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/clue/clueDetail.do/"+obj.id+"';\">" + obj.fullname + "" + obj.appellation + "</a></td>"
+					}
 					htmlStr += "<td>" + obj.company + "</td>"
 					htmlStr += "<td>" + obj.phone + "</td>"
 					htmlStr += "<td>" + obj.mphone + "</td>"
@@ -188,7 +322,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					htmlStr += "<td>" + obj.state + "</td>"
 					htmlStr += "</tr>"
 				});
-				$("#Ctbody").html(htmlStr);
+				$("#clueTbody").html(htmlStr);
 
 				//取消全选按钮
 				$("#checkAllClue").prop("checked", false);
@@ -221,6 +355,20 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						queryClueForPageByCondition(pageObj.currentPage, pageObj.rowsPerPage);
 					}
 				});
+			}
+		})
+	}
+	function showBtn(){
+		$.ajax({
+			url:'workbench/showMenu.do',
+			type:'post',
+			datatype:'json',
+			success:function (data){
+				if(data.includes("删除线索")){
+					let htmlStr ="";
+					htmlStr="<button type=\"button\" class=\"btn btn-danger\" id=\"deleteClueBtn\"><span class=\"glyphicon glyphicon-minus\"></span> 删除</button>"
+					$("#clueBtnBox").append(htmlStr);
+				}
 			}
 		})
 	}
@@ -380,8 +528,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					<h4 class="modal-title">修改线索</h4>
 				</div>
 				<div class="modal-body">
-					<form class="form-horizontal" role="form">
-					
+					<form class="form-horizontal" role="form" id="editClueForm">
+					<input type="hidden" id="edit-id">
 						<div class="form-group">
 							<label for="edit-owner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
@@ -502,7 +650,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button type="button" class="btn btn-primary" id="updateClueBtn">更新</button>
 				</div>
 			</div>
 		</div>
@@ -594,10 +742,10 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 40px;">
-				<div class="btn-group" style="position: relative; top: 18%;">
+				<div class="btn-group" style="position: relative; top: 18%;" id="clueBtnBox">
 				  <button type="button" class="btn btn-primary" id="createClueBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" id="editClueBtn"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger" id="deleteCLueBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+<%--				  <button type="button" class="btn btn-danger" id="deleteClueBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>--%>
 				</div>
 				
 				
@@ -616,7 +764,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<td>线索状态</td>
 						</tr>
 					</thead>
-					<tbody id="Ctbody">
+					<tbody id="clueTbody">
 <%--						<tr>--%>
 <%--							<td><input type="checkbox" /></td>--%>
 <%--							<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.html';">李四先生</a></td>--%>

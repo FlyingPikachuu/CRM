@@ -6,7 +6,7 @@ import com.qsy.utils.DateUtils;
 import com.qsy.utils.IDUtils;
 import com.qsy.workbench.dao.*;
 import com.qsy.workbench.pojo.*;
-import com.qsy.workbench.service.CLueService;
+import com.qsy.workbench.service.ClueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ import java.util.Map;
  * @create 2022/4/14 - 9:38
  */
 @Service
-public class ClueServiceImpl implements CLueService {
+public class ClueServiceImpl implements ClueService {
 
     @Autowired
     private ClueMapper clueMapper;
@@ -50,6 +50,8 @@ public class ClueServiceImpl implements CLueService {
     private TransactionMapper transactionMapper;
     @Autowired
     private TransactionRemarkMapper transactionRemarkMapper;
+    @Autowired
+    private TransactionHistoryMapper transactionHistoryMapper;
 
     @Override
     public int addClue(Clue clue) {
@@ -141,9 +143,9 @@ public class ClueServiceImpl implements CLueService {
                 corList.add(cor);
             }
             //转换线索备注信息到客户备注表
-            customerRemarkMapper.insertCustomerRemark(curList);
+            customerRemarkMapper.insertCustomerRemarkByList(curList);
             //转换线索备注信息到联系人备注表
-            contactRemarkMapper.insertContactRemark(corList);
+            contactRemarkMapper.insertContactRemarkByList(corList);
         }
         //根据ClueId查找线索活动关联记录
         List<ClueActivityRelation> carList = clueActivityRelationMapper.selectClueActivityRelationByClueId(clueId);
@@ -154,7 +156,7 @@ public class ClueServiceImpl implements CLueService {
                 coar = new ContactActivityRelation();
                 coar.setId(IDUtils.getId());
                 coar.setContactId(ct.getId());
-                coar.setActivityId(coar.getActivityId());
+                coar.setActivityId(car.getActivityId());
                 coarList.add(coar);
             }
             contactActivityRelationMapper.insertContactActivityRelation(coarList);
@@ -193,8 +195,18 @@ public class ClueServiceImpl implements CLueService {
                     trList.add(tr);
                 }
                 //添加交易备注
-                transactionRemarkMapper.insertTransactionRemark(trList);
+                transactionRemarkMapper.insertTransactionRemarkByList(trList);
             }
+            //添加交易历史
+            TransactionHistory tsh = new TransactionHistory();
+            tsh.setId(IDUtils.getId());
+            tsh.setMoney(ts.getMoney());
+            tsh.setStage(ts.getStage());
+            tsh.setCreateBy(user.getId());
+            tsh.setCreateTime(DateUtils.formatDateTime(new Date()));
+            tsh.setTranId(ts.getId());
+            tsh.setExpectedDate(ts.getExpectedDate());
+            transactionHistoryMapper.insertTransactionHistory(tsh);
         }
 
         //删除当前线索下的所有备注
@@ -206,5 +218,55 @@ public class ClueServiceImpl implements CLueService {
 
 
 
+    }
+
+    @Override
+    public Clue queryClueById(String id) {
+        return clueMapper.selectClueById(id);
+    }
+
+    @Override
+    public int editClueById(Clue clue) {
+        return clueMapper.updateClueById(clue);
+    }
+
+    @Override
+    public void deleteClue(String[] ids) {
+        clueMapper.deleteClueByIds(ids);
+    }
+
+    @Override
+    public List<FunnelVO> queryCountOfClueBySource() {
+        return clueMapper.selectCountOfClueBySource();
+    }
+
+    @Override
+    public List<FunnelVO> queryCountOfClueByState() {
+        return clueMapper.selectCountOfClueByState();
+    }
+
+    @Override
+    public List<LBVO> queryCountOfClueByOwnerAndCreate() {
+        return clueMapper.selectCountOfClueByOwnerAndCreate();
+    }
+
+    @Override
+    public List<LBVO> queryCountOfClueByCreateMonth() {
+        return clueMapper.selectCountOfClueByCreateMonth();
+    }
+
+    @Override
+    public List<Integer> queryMaxOfCreateClueInAYear() {
+        return clueMapper.selectMaxOfCreateClueInAYear();
+    }
+
+    @Override
+    public PieVO queryCountOfClue(Map<String, Object> map) {
+        return clueMapper.selectCountOfClue(map);
+    }
+
+    @Override
+    public int queryCountOfNewClue(Map<String, Object> map) {
+        return clueMapper.selectCountOfNewClue(map);
     }
 }

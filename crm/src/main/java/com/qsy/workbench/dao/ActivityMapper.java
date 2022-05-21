@@ -1,6 +1,10 @@
 package com.qsy.workbench.dao;
 
 import com.qsy.workbench.pojo.Activity;
+import com.qsy.workbench.pojo.FunnelVO;
+import com.qsy.workbench.pojo.LBVO;
+import com.qsy.workbench.pojo.PieVO;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +41,7 @@ public interface ActivityMapper {
     //根据活动id查询活动明细
     Activity selectActivityForDetailById(String id);
 
-    //根据clueId查询活动信息
+    //根据clueId查询已关联活动信息
     List<Activity> selectActivityForClueDetailByClueId(String clueId);
 
     //根据活动姓名模糊查询活动信息，除了已关联线索的活动
@@ -51,4 +55,32 @@ public interface ActivityMapper {
 
     //查询所有活动信息
     List<Activity> selectActivityForSaveTran(String name);
+
+    //根据contactId查询与联系人已关联的市场活动
+    List<Activity> selectActivityForContactDetailByContactId(String contactId);
+
+    //根据活动姓名模糊查询活动信息，除了已关联线索的活动
+    List<Activity> selectActivityForDetailByNameExpContactId(Map<String, Object> map);
+
+    //根据所有人分组查询市场活动在指定时间段内的数量
+    List<LBVO> selectActivityGroupByOwner(Map<String,Object> map);
+
+
+    //根据所有人分组查询市场活动正在进行的数量
+    List<LBVO> selectCountOfActivityInProgressGroupByOwner();
+    //查询当月创建市场活动top10
+    List<LBVO> selectCountOfActivityByOwnerAndCreate();
+    //2022各月份创建市场活动数量统计
+    List<LBVO> selectCountOfActivityByCreateMonth();
+    List<Integer> selectMaxOfCreateActivityInAYear();
+
+
+    //查询市场活动关联线索率
+    PieVO selectCountOfRelationActivity(Map<String,Object> map);
+
+    //查询指定日期内创建市场活动数量
+    int selectCountOfNewActivity(Map<String,Object> map);
+
+    //根据Id查询用户信息
+    List<Activity> selectActivityByIds(String[] ids);
 }

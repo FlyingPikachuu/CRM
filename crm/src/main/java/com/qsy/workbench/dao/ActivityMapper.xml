@@ -306,4 +306,99 @@
     join tbl_user u on a.owner = u.id
     where a.name like '%' #{name} '%';
   </select>
+  
+  <select id="selectActivityForContactDetailByContactId" parameterType="string" resultMap="BaseResultMap">
+    select a.id,a.name,a.start_date,a.end_date,u.name as owner
+    from tbl_activity a
+           join tbl_user u on a.owner = u.id
+           join tbl_contact_activity_relation car on a.id=car.activity_id
+    where car.contact_id = #{contactId};
+  </select>
+  <select id="selectActivityForDetailByNameExpContactId" parameterType="map" resultMap="BaseResultMap">
+    select a.id,a.name,a.start_date,a.end_date,u.name as owner
+    from tbl_activity a
+           join tbl_user u on a.owner = u.id
+    where a.name like '%' #{activityName} '%' and a.id not in(
+      select activity_id
+      from tbl_contact_activity_relation
+      where contact_id=#{contactId}
+    )
+  </select>
+  <select id="selectActivityGroupByOwner" resultType="lBVO">
+    select u1.name as name ,count(*) as value
+    from tbl_activity a
+    join tbl_user u1 on a.owner =u1.id
+    <include refid="main_query"></include>
+    group by owner
+    order by value;
+  </select>
+  <select id="selectCountOfActivityInProgressGroupByOwner" resultType="lBVO">
+    select u1.name as name ,count(*) as value
+    from tbl_activity a
+    join tbl_user u1 on a.owner =u1.id
+    where CURDATE() between start_date and end_date
+    group by owner;
+  </select>
+  <select id="selectCountOfActivityByCreateMonth" resultType="lBVO">
+    SELECT MONTH(create_time) as name ,COUNT(*) as value
+    FROM tbl_activity
+    WHERE YEAR(CURDATE())=YEAR(create_time)
+    GROUP BY MONTH(create_time);
+  </select>
+  <select id="selectCountOfActivityByOwnerAndCreate" resultType="lBVO">
+    select u1.name as name ,count(*) as value
+    from tbl_activity a
+    join tbl_user u1 on a.owner =u1.id
+    where month(create_time)=month(CURDATE())
+    group by a.owner
+    order by count(*)
+    limit 0,10;
+  </select>
+  <select id="selectMaxOfCreateActivityInAYear" resultType="int">
+    SELECT MAX(num) AS value
+    FROM (SELECT COUNT(*) AS num,groupTime,OWNER
+    FROM (SELECT id, create_time, OWNER, @groupTime:=DATE_FORMAT(create_time,'%Y-%m') AS groupTime
+    FROM tbl_activity) AS a
+    GROUP BY groupTime,OWNER)AS b
+    GROUP BY groupTime
+  </select>
+  <select id="selectCountOfRelationActivity" resultType="pieVO" parameterType="map">
+    SELECT a.num,b.sum FROM
+(SELECT COUNT(DISTINCT activity_id) AS num
+FROM tbl_clue_activity_relation WHERE activity_id IN ( SELECT id
+FROM tbl_activity <include refid="main_query"></include> )) AS a,
+(
+SELECT COUNT(*) AS SUM
+FROM tbl_activity <include refid="main_query"></include> ) AS b
+  </select>
+  <select id="selectCountOfNewActivity" resultType="_int" parameterType="map">
+    select count(*)
+    from tbl_activity
+    <include refid="main_query"></include>
+  </select>
+  <select id="selectActivityByIds" parameterType="string" resultMap="BaseResultMap">
+    select a.id, u1.name as owner, a.name, a.start_date, a.end_date, a.cost, a.description, a.create_time, u2.name as create_by, a.edit_time, u3.name as edit_by
+    from tbl_activity a
+           join tbl_user u1 on a.owner = u1.id
+           join tbl_user u2 on a.create_by = u2.id
+           left join tbl_user u3 on a.edit_by = u3.id
+   <where>
+     a.id in
+     <foreach collection="array" item="id"
+             open="(" separator="," close=")" nullable="true">
+      #{id}
+    </foreach>
+   </where>
+    order by a.create_time desc ;
+  </select>
+  <sql id="main_query">
+    <where>
+      <if test="startDate!=null and startDate!=''">
+        and create_time&gt;=#{startDate}
+      </if>
+      <if test="endDate!=null and endDate!=''">
+        and create_time&lt;=#{endDate}
+      </if>
+    </where>
+  </sql>
 </mapper>

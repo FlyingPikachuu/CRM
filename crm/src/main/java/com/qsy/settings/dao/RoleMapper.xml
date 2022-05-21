@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qsy.settings.dao.RoleMapper">
+  <resultMap id="BaseResultMap" type="com.qsy.settings.pojo.Role">
+    <id column="code" jdbcType="CHAR" property="code" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    code, name, description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_role
+    where code = #{code,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from tbl_role
+    where code = #{code,jdbcType=CHAR}
+  </delete>
+  <insert id="insert" parameterType="com.qsy.settings.pojo.Role">
+    insert into tbl_role (code, name, description
+      )
+    values (#{code,jdbcType=CHAR}, #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.qsy.settings.pojo.Role">
+    insert into tbl_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        code,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        #{code,jdbcType=CHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qsy.settings.pojo.Role">
+    update tbl_role
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where code = #{code,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qsy.settings.pojo.Role">
+    update tbl_role
+    set name = #{name,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR}
+    where code = #{code,jdbcType=CHAR}
+  </update>
+
+  <select id="selectAllRole" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_role;
+  </select>
+  <insert id="insertRole" parameterType="dept">
+    insert into tbl_role (code, name, description)
+    values (#{code},#{name},#{description});
+  </insert>
+  <update id="updateRoleByCode" parameterType="map">
+    update tbl_role
+    set code = #{code},
+        name = #{name},
+        description = #{description}
+    where code = #{oldCode};
+  </update>
+  <delete id="deleteRoleByCode" parameterType="string">
+    delete
+    from tbl_role
+    where code in
+    <foreach collection="array" item="code" open=" (" separator="," close=")">
+      #{code}
+    </foreach>
+  </delete>
+  <select id="selectRoleByCode" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_role
+    where code = #{code};
+  </select>
+  <select id="selectNotAssignedRole" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_role
+    where code not in
+    <foreach collection="array" item="code" open=" (" close=")" separator=",">
+      #{code}
+    </foreach>
+  </select>
+  <select id="selectAssignedRole" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_role
+    where code in
+    <foreach collection="array" item="code" open=" (" close=")" separator=",">
+      #{code}
+    </foreach>
+  </select>
+
+</mapper>

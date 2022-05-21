@@ -18,6 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,7 +50,7 @@ public class ActivityController {
         return "workbench/activity/index";
     }
 
-    @RequestMapping("workbench/activity/addActivity.do")
+    @RequestMapping("/workbench/activity/addActivity.do")
     @ResponseBody
     public Object addActivity(Activity activity, HttpSession session){
         //封装参数
@@ -195,10 +196,16 @@ public class ActivityController {
     }
 
     //列表导出为文件/批量文件下载
-    @RequestMapping("/workbench/activity/exportQueryAllActivity.do")
-    public void exportQueryAllActivity(HttpServletResponse response) throws Exception{
+    @RequestMapping("/workbench/activity/exportQueryAllActivity.do/{ids}")
+    public void exportQueryAllActivity(HttpServletResponse response,@PathVariable String ids) throws Exception{
         //调用service层方法，查询所以活动信息
-        List<Activity> activityList = activityService.queryAllActivity();
+        List<Activity> activityList = new ArrayList<>();
+        if(ids.equals("all")){
+            activityList = activityService.queryAllActivity();
+        }else{
+            activityList = activityService.queryActivityByIds(ids.split(","));
+        }
+
         //创建excel文件，并把activityList放入excel
         //horrible spreadsheet format 讨厌的电子表格
         HSSFWorkbook workbook= new HSSFWorkbook();
@@ -400,8 +407,8 @@ public class ActivityController {
     }
 
     //查询活动明细
-    @RequestMapping("/workbench/activity/queryActivityDetail.do")
-    public String  ActivityDetail(String id,Model model){
+    @RequestMapping("/workbench/activity/queryActivityDetail.do/{id}")
+    public String  ActivityDetail(@PathVariable String id, Model model){
         //调用service层方法，查询活动信息和备注信息
         Activity activity = activityService.queryActivityForDetailById(id);
         List<ActivityRemark> remarkList = activityRemarkService.queryActivityRemarkForDetailByActivityId(id);

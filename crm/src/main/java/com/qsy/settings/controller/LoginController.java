@@ -1,11 +1,10 @@
 package com.qsy.settings.controller;
 
-import com.qsy.utils.ReturnInfoObject;
+import com.qsy.settings.pojo.Permission;
+import com.qsy.settings.pojo.Role;
+import com.qsy.settings.service.*;
+import com.qsy.utils.*;
 import com.qsy.settings.pojo.User;
-import com.qsy.settings.service.UserService;
-import com.qsy.utils.Constants;
-import com.qsy.utils.DateUtils;
-import com.qsy.utils.IDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +29,14 @@ public class LoginController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private DeptService deptService;
+    @Autowired
+    private PermissionService permissionService;
+    @Autowired
+    private RolePermissionRelationService rolePermissionRelationService;
+    @Autowired
+    private RoleService roleService;
     /*
     * 理论上，给Controller 方法分配url: http://127.0.0.1:8080/crm/
       为了简便，协议://ip:port/应用名称 将这些省去，用/代表应用根目录下的/
@@ -76,13 +83,37 @@ public class LoginController {
             else if(!user.getAllowIps().contains(request.getRemoteAddr())){
                 returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
                 returnInfoObject.setMessage("用户ip被禁用");
+            }else if(user.getRoleno()==null||user.getRoleno().equals("")){
+                returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_FAIL);
+                returnInfoObject.setMessage("用户没有权限");
             }
             else{
                 //登录成功
                 returnInfoObject.setCode(Constants.RETURN_OBJECT_CODE_SUCCESS);
+                String roleName= "";
+                List<Role> roleList = roleService.queryAssignedRole(user.getRoleno().split(","));
+                for (int i = 0; i < roleList.size() ; i++) {
+                    if(i<roleList.size()-1){
+                        roleName+=roleList.get(i).getName()+",";
+                    }else{
+                        roleName+=roleList.get(i).getName();
+                    }
+                }
+                user.setRoleName(roleName);
+                user.setLoginTime( String.valueOf(new Date().getTime()));
 
                 //把user保存到session中
                 session.setAttribute(Constants.SESSION_USER,user);
+//                String roleno = user.getRoleno();
+//                String[] split = roleno.split(",");
+//                List<String> strings = rolePermissionRelationService.queryPidByRoleIds(split);
+//                String s = MyStringUtils.stringListUnionRet(strings);
+//                List<Permission> userPermissionList = permissionService.queryPermissionByIds(s.split(","));
+//                //把user的permissionList保存到session中
+//                session.setAttribute(Constants.SESSION_USER_PERMISSION_LIST,userPermissionList);
+//
+//                List<Permission> allPermissionList = permissionService.queryAllPermission();
+//                session.setAttribute(Constants.SESSION_PERMISSION_LIST,allPermissionList);
 
                 //如果需要记住密码，则往客户端返回cookie，保存在客户端，待下次发出请求时传给后端
                 if("true".equals(isRemPwd)){

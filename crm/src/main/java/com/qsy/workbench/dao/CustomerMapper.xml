@@ -15,6 +15,8 @@
     <result column="next_contact_time" jdbcType="CHAR" property="nextContactTime" />
     <result column="description" jdbcType="VARCHAR" property="description" />
     <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="owner_name" jdbcType="VARCHAR" property="ownerName"/>
+    <result column="money" jdbcType="VARCHAR" property="money"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, owner, name, website, phone, create_by, create_time, edit_by, edit_time, contact_summary, 
@@ -203,4 +205,146 @@
     from tbl_customer
     where name = #{name};
   </select>
+  <select id="selectCustomerByConditionForPage" parameterType="map" resultMap="BaseResultMap">
+    select cut.id, u1.name as owner, cut.name, cut.website, cut.phone, u2.name as create_by, cut.create_time, u3.name as edit_by, cut.edit_time, cut.contact_summary, cut.next_contact_time, cut.description, cut.address
+    from tbl_customer cut
+    join tbl_user u1 on cut.owner = u1.id
+    join tbl_user u2 on cut.create_by = u2.id
+    left join tbl_user u3 on cut.edit_by = u3.id
+    <where>
+      <if test="name!=null and name!=''">
+        and cut.name like '%' #{name} '%'
+      </if>
+      <if test="owner!=null and owner!=''">
+        and u1.name like '%' #{owner} '%'
+      </if>
+      <if test="phone!=null and phone!=''">
+        and cut.phone like '%' #{phone} '%'
+      </if>
+      <if test="website!=null and website!=''">
+        and cut.website like '%' #{website} '%'
+      </if>
+    </where>
+    order by cut.create_time desc
+    limit #{beginNo},#{pageSize};
+  </select>
+  <select id="selectCountOfCustomerByCondition" parameterType="map" resultType="_int">
+    select count(*)
+    from tbl_customer cut
+    join tbl_user u1 on cut.owner = u1.id
+    join tbl_user u2 on cut.create_by = u2.id
+    left join tbl_user u3 on cut.edit_by = u3.id
+    <where>
+      <if test="name!=null and name!=''">
+        and cut.name like '%' #{name} '%'
+      </if>
+      <if test="owner!=null and owner!=''">
+        and u1.name like '%' #{owner} '%'
+      </if>
+      <if test="phone!=null and phone!=''">
+        and cut.phone like '%' #{phone} '%'
+      </if>
+      <if test="website!=null and website!=''">
+        and cut.website like '%' #{website} '%'
+      </if>
+    </where>
+  </select>
+  <select id="selectCustomerById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from tbl_customer
+    where id = #{id};
+  </select>
+  <update id="updateCustomerById" parameterType="customer">
+    update tbl_customer
+    set owner = #{owner},
+        name = #{name},
+        website = #{website},
+        phone = #{phone},
+        edit_by = #{editBy},
+        edit_time = #{editTime},
+        contact_summary = #{contactSummary},
+        next_contact_time = #{nextContactTime},
+        description = #{description},
+        address = #{address}
+    where id = #{id};
+  </update>
+  <delete id="deleteCustomerByIds" parameterType="string">
+    delete
+    from tbl_customer
+    where id in
+    <foreach collection="array" item="id" open=" (" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+  <select id="selectCustomerByIdForDetail" parameterType="string" resultMap="BaseResultMap">
+    select cut.id, u1.name as owner_name,cut.owner, cut.name, cut.website, cut.phone, u2.name as create_by, cut.create_time, u3.name as edit_by, cut.edit_time, cut.contact_summary, cut.next_contact_time, cut.description, cut.address
+    from tbl_customer cut
+    join tbl_user u1 on cut.owner = u1.id
+    join tbl_user u2 on cut.create_by = u2.id
+    left join tbl_user u3 on cut.edit_by = u3.id
+    where cut.id = #{id};
+  </select>
+  <select id="selectCountOfCustomerByCutAddress" resultType="funnelVO">
+    SELECT LEFT(address,2) AS NAME,COUNT(*) AS VALUE
+    FROM tbl_customer
+    GROUP BY LEFT(address,2)
+    ORDER BY VALUE
+  </select>
+  <select id="selectCustomerByAddress" resultMap="BaseResultMap">
+    SELECT  DISTINCT id,name,phone,website,b.totalmoney as money
+    FROM tbl_customer ,(SELECT a.name AS name1,SUM(money) AS totalmoney FROM (SELECT customer_id AS NAME ,money FROM tbl_tran WHERE stage ='29805c804dd94974b568cfc9017b2e4c') a
+    GROUP BY a.name  ) AS b  WHERE id = name1 AND address LIKE  '%' '北京' '%'
+    ORDER BY b.totalmoney DESC
+    LIMIT 0,6;
+  </select>
+  <select id="selectCountOfCustomerByOwnerAndCreate" resultType="lBVO">
+    select u1.name as name ,count(*) as value
+    from tbl_customer c
+    join tbl_user u1 on c.owner =u1.id
+    where month(create_time)=month(CURDATE())
+    group by c.owner
+    order by count(*)
+    limit 0,10;
+  </select>
+  <select id="selectCountOfCustomerByCreateMonth" resultType="lBVO">
+    SELECT DISTINCT a.name AS NAME,a.value AS VALUE,COALESCE(b.value,0) AS value2 FROM
+    (SELECT MONTH(create_time) AS NAME ,COUNT(*) AS VALUE
+    FROM tbl_customer
+    WHERE YEAR(CURDATE())=YEAR(create_time)
+    GROUP BY MONTH(create_time))a LEFT JOIN (SELECT MONTH(create_time) AS NAME ,COUNT(*) AS VALUE
+    FROM tbl_tran
+    WHERE YEAR(CURDATE())=YEAR(create_time)
+    GROUP BY MONTH(create_time))b
+    ON a.name =b.name
+    ORDER BY a.name
+  </select>
+  <select id="selectCountOfCustomer" resultType="pieVO" parameterType="map">
+    SELECT a.num,b.sum FROM
+    (SELECT COUNT(*) AS num
+    FROM tbl_customer
+    WHERE id IN (SELECT customer_id FROM tbl_tran WHERE stage='29805c804dd94974b568cfc9017b2e4c')
+    <if test="startDate!=null and startDate!=''">
+      and create_time&gt;=#{startDate}
+    </if>
+    <if test="endDate!=null and endDate!=''">
+      and create_time&lt;=#{endDate}
+    </if> )AS a,
+    (SELECT COUNT(*) AS SUM
+    FROM tbl_customer <include refid="main_query"></include>)AS b
+  </select>
+  <select id="selectCountOfNewCustomer" resultType="_int" parameterType="map">
+    select count(*)
+    from tbl_customer
+    <include refid="main_query"></include>
+  </select>
+  <sql id="main_query">
+    <where>
+      <if test="startDate!=null and startDate!=''">
+        and create_time&gt;=#{startDate}
+      </if>
+      <if test="endDate!=null and endDate!=''">
+        and create_time&lt;=#{endDate}
+      </if>
+    </where>
+  </sql>
 </mapper>

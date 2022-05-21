@@ -17,12 +17,15 @@ public interface ActivityRemarkMapper {
 
     int updateByPrimaryKey(ActivityRemark row);
 
+    //查询所有备注
     List<ActivityRemark> selectActivityRemarkForDetailByActivityId(String id);
 
+    //添加一条备注
     int insertActivityRemark(ActivityRemark activityRemark);
 
+    //删除一条备注
     int deleteActivityRemarkById(String id);
 
-    //修改市场活动备注
+    //修改一条备注
     int updateActivityRemark(ActivityRemark activityRemark);
 }

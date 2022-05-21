@@ -25,9 +25,11 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 <script type="text/javascript">
 
 	$(function(){
+		showBtn();
 		$("#createTranBtn").click(function (){
 			window.location.href='workbench/transaction/toSave.do';
 		});
+		//当交易主页面加载完成之后,显示所有数据的第一页，默认pageSize=10
 		queryTransactionByConditionForPage(1,10);
 
 		//给"查询"按钮添加单击事件
@@ -37,7 +39,76 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			//pagination插件 getOption 函数 获取当前客户端分页工具中用户选择的参数值
 			queryTransactionByConditionForPage(1,$("#Tran_pag").bs_pagination("getOption","rowsPerPage"));
 		});
-		
+		//给'全选'复选框添加单击事件
+		$("#checkAllTran").click(function (){
+			$("#TranTbody input[type='checkbox']").prop("checked",this.checked);
+		});
+		//给列表的复选框添加单击事件 方式二 针对动态生成元素
+		$("#TranTbody").on("click","input[type='checkbox']",function (){
+			if($("#TranTbody input[type='checkbox']").size()==$("#TranTbody input[type='checkbox']:checked").size()){
+				$("#checkAllTran").prop("checked",true);
+			}
+			else{
+				$("#checkAllTran").prop("checked",false);
+			}
+		})
+
+		//给修改按钮添加单击事件
+		$("#editTranBtn").click(function (){
+			let checkedIds=$("#TranTbody input[type='checkbox']:checked");
+			if(checkedIds.size()==0){
+				alert("请选择要修改的交易");
+				return;
+			}
+			if(checkedIds.size()>1){
+				alert("每次只能修改一条交易");
+				return;
+			}
+			// 取dom对象属性值三种方法
+			// let id=checkedIds.val();
+			// let id=checkedIds.get(0).value;
+			let id=checkedIds[0].value;
+			alert(id);
+			window.location.href='workbench/transaction/toEdit.do/'+id;
+		});
+		//给”删除“按钮添加点击事件
+		$("#tranBtnBox").on('click','#deleteTranBtn',function (){
+			//收集参数
+			let checkedIds = $("#TranTbody input[type='checkbox']:checked");
+			if(checkedIds.size()==0){
+				alert("请选择要删除的交易");
+				return;
+			}
+			//弹对话框
+			if(window.confirm("确定删除吗？")){
+				//获取所有 选择的checkbox上value属性值上绑定的id
+				// 遍历checkedIds变量 选择jq函数
+				let ids="";
+				$.each(checkedIds,function (){
+					//this 和 obj一样 从变量中取出元素放这俩里面
+					//一般只有一个属性值时，用this 简单
+					//!!!!!注意 这里拼接的ids要与controller方法中参数名相同
+					ids+="ids="+this.value+"&";
+				});
+				//去除最后的&
+				ids=ids.substr(0,ids.length-1);
+				//发送请求
+				alert(ids);
+				$.ajax({
+					url:'workbench/transaction/deleteTranByIds.do',
+					data:ids,
+					type:'post',
+					datatype: 'json',
+					success:function (data){
+						if(data.code=="1"){
+							queryTransactionByConditionForPage($("#Tran_pag").bs_pagination("getOption","currentPage"),$("#Tran_pag").bs_pagination("getOption","rowsPerPage"));
+						}else{
+							alert(data.message);
+						}
+					}
+				});
+			}
+		});
 	});
 
 	function queryTransactionByConditionForPage(pageNo,pageSize){
@@ -70,7 +141,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				$.each(data.tList,function (index,tran){
 					htmlStr+="<tr>";
 					htmlStr+="<td><input type=\"checkbox\" value=\""+tran.id+"\"/></td>";
-					htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/transaction/queryTransactionDetail.do?id="+tran.id+"';\">"+tran.name+"</a></td>";
+					htmlStr+="<td><a style=\"text-decoration: none; cursor: pointer;\" onclick=\"window.location.href='workbench/transaction/queryTransactionForDetailById.do/"+tran.id+"';\">"+tran.name+"</a></td>";
 					htmlStr+="<td>"+tran.customerId+"</td>";
 					htmlStr+="<td>"+tran.stage+"</td>";
 					htmlStr+="<td>"+tran.type+"</td>";
@@ -123,7 +194,20 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		});
 
 	}
-
+	function showBtn(){
+		$.ajax({
+			url:'workbench/showMenu.do',
+			type:'post',
+			datatype:'json',
+			success:function (data){
+				if(data.includes("删除交易")){
+					let htmlStr ="";
+					htmlStr="<button type=\"button\" class=\"btn btn-danger\" id=\"deleteTranBtn\"><span class=\"glyphicon glyphicon-minus\"></span> 删除</button>"
+					$("#tranBtnBox").append(htmlStr);
+				}
+			}
+		})
+	}
 </script>
 </head>
 <body>
@@ -216,10 +300,10 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				</form>
 			</div>
 			<div class="btn-toolbar" role="toolbar" style="background-color: #F7F7F7; height: 50px; position: relative;top: 10px;">
-				<div class="btn-group" style="position: relative; top: 18%;">
+				<div class="btn-group" style="position: relative; top: 18%;" id="tranBtnBox">
 				  <button type="button" class="btn btn-primary" id="createTranBtn"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" id="editTranBtn" onclick="window.location.href='edit.html';"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button type="button" class="btn btn-default" id="editTranBtn" ><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+<%--				  <button type="button" class="btn btn-danger" id="deleteTranBtn"><span class="glyphicon glyphicon-minus"></span> 删除</button>--%>
 				</div>
 				
 				

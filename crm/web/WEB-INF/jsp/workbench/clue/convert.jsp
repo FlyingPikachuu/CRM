@@ -52,7 +52,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		$("#searchActivityTxt").keyup(function (){
 			let activityName=this.value;
 			let clueId='${clue.id}';
-			alert(activityName);
 			//发送请求
 			$.ajax({
 				url:'workbench/clue/searchActivity.do',
@@ -98,6 +97,14 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			let stage = $("#stage").val();
 			let activityId = $("#activityId").val();
 			let isCreateTran = $("#isCreateTransaction").prop('checked');
+			if(tradeName==""){
+				alert("交易名称不为空！");
+				return;
+			}
+			if(stage==""){
+				alert("阶段不为空！");
+				return;
+			}
 			$.ajax({
 				url:'workbench/clue/saveConvertClue.do',
 				data:{
@@ -120,6 +127,9 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				}
 			});
 		});
+		$("#cancelBtn").click(function (){
+			window.history.back();
+		})
 
 	});
 </script>
@@ -200,7 +210,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		    <input type="text" class="form-control" id="amountOfMoney">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
-		    <label for="tradeName">交易名称</label>
+		    <label for="tradeName">交易名称<span style="font-size: 15px; color: red;">*</span></label>
 		    <input type="text" class="form-control" id="tradeName" value="${clue.company}-">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
@@ -208,7 +218,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		    <input type="text" class="form-control" id="expectedDate">
 		  </div>
 		  <div class="form-group" style="width: 400px;position: relative; left: 20px;">
-		    <label for="stage">阶段</label>
+		    <label for="stage">阶段<span style="font-size: 15px; color: red;">*</span></label>
 		    <select id="stage"  class="form-control">
 		    	<option></option>
 		    	<c:forEach items="${stageList}" var="sl">
@@ -232,7 +242,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 	<div id="operation" style="position: relative; left: 40px; height: 35px; top: 100px;">
 		<input id="ConvertBtn" class="btn btn-primary" type="button" value="转换">
 		&nbsp;&nbsp;&nbsp;&nbsp;
-		<input class="btn btn-default" type="button" value="取消">
+		<input id="cancelBtn" class="btn btn-default" type="button" value="取消">
 	</div>
 </body>
 </html>

@@ -78,8 +78,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="<img title=\"${sessionScope.userInfo.name}\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">"
 						htmlStr+="<div style=\"position: relative; top: -40px; left: 40px;\" >"
 						htmlStr+="<h5>"+data.returnData.noteContent+"</h5>"
-						htmlStr+="<font color=\"gray\">客户</font> <font color=\"gray\">-</font> <b>${cut.name}</b> <small style=\"color: gray;\"> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}</small>"
-						htmlStr+="<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">"
+						htmlStr+="<font color=\"gray\">客户</font> <font color=\"gray\">-</font> <b>${cut.name}</b> <small style=\"color: gray;\" id='createName'> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}</small>"
+						htmlStr+="<div id='remarkABox' style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">"
 						htmlStr+="<a class=\"myHref\" id=\"editA\" remarkId=\""+data.returnData.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>"
 						htmlStr+="&nbsp;&nbsp;&nbsp;&nbsp;"
 						htmlStr+="<a class=\"myHref\" id=\"deleteA\" remarkId=\""+data.returnData.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>"
@@ -87,7 +87,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="</div>"
 						htmlStr+="</div>"
 						$("#remarkHeader").after(htmlStr);
-
+						showBtn();
 						$("#create-noteContent").val("");
 					}
 					else{
@@ -351,14 +351,36 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					htmlStr="<button type=\"button\" class=\"btn btn-danger\" id=\"deleteCustomerBtn\"><span class=\"glyphicon glyphicon-minus\"></span> 删除</button>"
 					$("#customerBtnBox").append(htmlStr);
 				}
-				if(!data.includes("删除交易")){
-					let tr =$("#tranTbody a[id='deleteTranA']");
-					for (let i = 0; i < tr.length; i++) {
-						tr[i].remove()
+				if(!data.includes("备注管理")){
+					showRemarkA()
+				}else{
+					let user = '${sessionScope.userInfo.name}'
+					let createBy = $("#remarkDivList small[id='createName']");
+					let a = $("#remarkDivList div[id='remarkABox']");
+					let updA = $("#remarkABox a[id='editA']");
+					for (let i = 0; i < createBy.length; i++) {
+						// console.log(createBy[i].innerText)
+						if(!createBy[i].innerText.includes(user)) {
+							for (let j = 0; j < updA.length; j++) {
+								// console.log(createBy[i].innerText)
+								updA[i].remove();
+							}
+						}
 					}
 				}
 			}
 		})
+	}
+	function showRemarkA(){
+		let user = '${sessionScope.userInfo.name}'
+		let createBy = $("#remarkDivList small[id='createName']");
+		let a = $("#remarkDivList div[id='remarkABox']");
+		for (let i = 0; i < createBy.length; i++) {
+			// console.log(createBy[i].innerText)
+			if(!createBy[i].innerText.includes(user)) {
+				a[i].remove();
+			}
+		}
 	}
 	
 </script>
@@ -766,8 +788,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				<img title="${cutr.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 				<div style="position: relative; top: -40px; left: 40px;" >
 					<h5>${cutr.noteContent}</h5>
-					<font color="gray">客户</font> <font color="gray">-</font> <b>${cut.name}</b> <small style="color: gray;"> ${cutr.editFlag=="0"?cutr.createTime:cutr.editTime} 由${cutr.editFlag=="0"?cutr.createBy:cutr.editBy}${cutr.editFlag=='0'?'创建':'修改'}</small>
-					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+					<font color="gray">客户</font> <font color="gray">-</font> <b>${cut.name}</b> <small style="color: gray;" id="createName"> ${cutr.editFlag=="0"?cutr.createTime:cutr.editTime} 由${cutr.editFlag=="0"?cutr.createBy:cutr.editBy}${cutr.editFlag=='0'?'创建':'修改'}</small>
+					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;" id="remarkABox">
 						<a class="myHref" id="editA" remarkId="${cutr.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<a class="myHref" id="deleteA" remarkId="${cutr.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>
@@ -850,7 +872,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			</div>
 			
 			<div>
-				<a href="workbench/transaction/toSave.do" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>新建交易</a>
+				<a href="workbench/transaction/toSave.do?id=${cut.id}" style="text-decoration: none;"><span class="glyphicon glyphicon-plus"></span>新建交易</a>
 			</div>
 		</div>
 	</div>

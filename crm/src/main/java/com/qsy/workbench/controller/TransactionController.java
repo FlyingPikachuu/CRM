@@ -88,7 +88,9 @@ public class TransactionController {
         return  ret;
     }
     @RequestMapping("/workbench/transaction/toSave.do")
-    public String toSave(Model model){
+    public String toSave(Model model,String id){
+        Contact cot= contactService.queryContactById(id);
+        Customer cut = customerService.queryCustomerById(id);
         List<User> userList = userService.queryAllUser();
         List<DicValue> stageList = dicValueService.queryDicValueByTypeCode("stage");
         List<DicValue> typeList = dicValueService.queryDicValueByTypeCode("transactionType");
@@ -98,6 +100,8 @@ public class TransactionController {
         model.addAttribute("stageList",stageList);
         model.addAttribute("typeList",typeList);
         model.addAttribute("sourceList",sourceList);
+        model.addAttribute("cot",cot);
+        model.addAttribute("cut",cut);
 
         return "/workbench/transaction/save";
     }

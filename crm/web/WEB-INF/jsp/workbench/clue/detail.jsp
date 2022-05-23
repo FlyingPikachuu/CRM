@@ -19,7 +19,6 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 	
 	$(function(){
 		showBtn();
-
 		//阻止BootStrap框架默认回车键刷新表单，导致模态窗口关闭，页面内容消失的问题
 		$(document).keydown(function(event){
 			if (event.keyCode == 13) {
@@ -101,8 +100,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="<img title=\"${sessionScope.userInfo.name}\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">";
 						htmlStr+="<div style=\"position: relative; top: -40px; left: 40px;\" >";
 						htmlStr+="<h5>"+data.returnData.noteContent+"</h5>";
-						htmlStr+="<font color=\"gray\">线索</font> <font color=\"gray\">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style=\"color: gray;\"> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}创建</small>";
-						htmlStr+="<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
+						htmlStr+="<font color=\"gray\">线索</font> <font color=\"gray\">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style=\"color: gray;\" id='createName'> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}创建</small>";
+						htmlStr+="<div id='remarkABox' style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
 						htmlStr+="<a class=\"myHref\" id=\"editA\" remarkId=\""+data.returnData.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
 						htmlStr+="&nbsp;&nbsp;&nbsp;&nbsp;";
 						htmlStr+="<a class=\"myHref\" id=\"deleteA\" remarkId=\""+data.returnData.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
@@ -111,7 +110,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="</div>";
 
 						$("#remarkHeader").after(htmlStr);
-
+						showBtn();
 						$("#add-ClueRemark").val("");
 					}
 					else{
@@ -334,11 +333,39 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 					let htmlStr ="";
 					htmlStr="<button type=\"button\" class=\"btn btn-default\" id=\"convertClueBtn\"><span class=\"glyphicon glyphicon-retweet\"></span> 转换</button>"
 					$("#convertDiv").html(htmlStr);
-
+				}
+				if(!data.includes("备注管理")){
+					showRemarkA()
+				}else{
+					let user = '${sessionScope.userInfo.name}'
+					let createBy = $("#remarkDivList small[id='createName']");
+					let a = $("#remarkDivList div[id='remarkABox']");
+					let updA = $("#remarkABox a[id='editA']");
+					for (let i = 0; i < createBy.length; i++) {
+						// console.log(createBy[i].innerText)
+						if(!createBy[i].innerText.includes(user)) {
+							for (let j = 0; j < updA.length; j++) {
+								// console.log(createBy[i].innerText)
+								updA[i].remove();
+							}
+						}
+					}
 				}
 			}
 		})
 	}
+	function showRemarkA(){
+		let user = '${sessionScope.userInfo.name}'
+		let createBy = $("#remarkDivList small[id='createName']");
+		let a = $("#remarkDivList div[id='remarkABox']");
+		for (let i = 0; i < createBy.length; i++) {
+			// console.log(createBy[i].innerText)
+			if(!createBy[i].innerText.includes(user)) {
+				a[i].remove();
+			}
+		}
+	}
+
 
 </script>
 
@@ -547,8 +574,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				<img title="${crl.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 				<div style="position: relative; top: -40px; left: 40px;" >
 					<h5>${crl.noteContent}</h5>
-					<font color="gray">线索</font> <font color="gray">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style="color: gray;"> ${crl.editFlag=="0"?crl.createTime:crl.editTime} 由${crl.editFlag=="0"?crl.createBy:crl.editBy}${crl.editFlag=='0'?'创建':'修改'}</small>
-					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+					<font color="gray">线索</font> <font color="gray">-</font> <b>${clue.fullname}${clue.appellation}-${clue.company}</b> <small style="color: gray;" id="createName"> ${crl.editFlag=="0"?crl.createTime:crl.editTime} 由${crl.editFlag=="0"?crl.createBy:crl.editBy}${crl.editFlag=='0'?'创建':'修改'}</small>
+					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;" id="remarkABox">
 						<a class="myHref" id="editA" remarkId="${crl.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<a class="myHref" id="deleteA" remarkId="${crl.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>

@@ -33,6 +33,15 @@ public class User {
     private  String roleName;
     private  String lockStateName;
     private String loginTime;
+    private String createName;
+
+    public String getCreateName() {
+        return createName;
+    }
+
+    public void setCreateName(String createName) {
+        this.createName = createName;
+    }
 
     public String getLoginTime() {
         return loginTime;

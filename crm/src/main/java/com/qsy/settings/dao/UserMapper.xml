@@ -17,6 +17,7 @@
     <result column="edit_by" jdbcType="VARCHAR" property="editBy" />
     <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
     <result column="dept_name" jdbcType="VARCHAR" property="deptName"/>
+    <result column="create_name" jdbcType="VARCHAR" property="createName"/>
   </resultMap>
   <sql id="Base_Column_List">
     id, login_act, name, login_pwd, email, expire_time, lock_state, deptno, roleno,allow_ips,
@@ -188,11 +189,12 @@
     where id = #{id,jdbcType=CHAR}
   </update>
   <select id="selectByLoginActAndLoginPwd" parameterType="map" resultMap="BaseResultMap">
-    select u.id, u.login_act, u.name, u.login_pwd, u.email, u.expire_time, u.lock_state, u.deptno, u.roleno, u.allow_ips, u.createTime, u.create_by, u.edit_time, u.edit_by,r.name as role_name,d.name as dept_name
+    select u.id, u.login_act, u.name, u.login_pwd, u.email, u.expire_time, u.lock_state, u.deptno, u.roleno, u.allow_ips, u.createTime,u1.name as create_name, u.create_by, u.edit_time, u.edit_by,r.name as role_name,d.name as dept_name
     from tbl_user u
     join tbl_dept d on u.deptno = d.code
     left join tbl_role r on u.roleno = r.code
-    where login_act = #{loginAct} and login_pwd =#{loginPwd};
+    join tbl_user u1 on u.create_by = u1.id
+    where u.login_act = #{loginAct} and u.login_pwd =#{loginPwd};
   </select>
   <select id="selectAllUser" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"/>

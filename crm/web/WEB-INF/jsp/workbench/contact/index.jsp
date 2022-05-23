@@ -51,7 +51,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		});
 
 		//日历插件
-		$(".myDate").datetimepicker({
+		$(".birth").datetimepicker({
 			language:'zh-CN',
 			format:'yyyy-mm-dd',
 			minView:'month',
@@ -59,6 +59,16 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			autoclose:true,
 			todayBtn:true,
 			clearBtn:true
+		})
+		$(".myDate").datetimepicker({
+			language:'zh-CN',
+			format:'yyyy-mm-dd',
+			minView:'month',
+			initialDate:new Date(),
+			autoclose:true,
+			todayBtn:true,
+			clearBtn:true,
+			pickerPosition:'top-right'
 		})
 
 		//定制字段
@@ -483,7 +493,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<div class="form-group">
 								<label for="create-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 								<div class="col-sm-10" style="width: 300px;">
-									<input type="text" class="form-control" id="create-nextContactTime">
+									<input type="text" class="form-control myDate" id="create-nextContactTime" readonly >
 								</div>
 							</div>
 						</div>
@@ -606,7 +616,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<div class="form-group">
 								<label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 								<div class="col-sm-10" style="width: 300px;">
-									<input type="text" class="form-control" id="edit-nextContactTime">
+									<input type="text" class="form-control myDate" id="edit-nextContactTime" readonly>
 								</div>
 							</div>
 						</div>
@@ -689,7 +699,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">生日</div>
-				      <input id="query-birth" class="form-control myDate" type="text" readonly>
+				      <input id="query-birth" class="form-control birth" type="text" readonly placeholder="查询输入日期前一周内生日的联系人" style="width: 300px">
 				    </div>
 				  </div>
 				  

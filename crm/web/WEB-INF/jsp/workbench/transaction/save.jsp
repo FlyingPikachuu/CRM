@@ -388,8 +388,14 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		<div class="form-group">
 			<label for="create-customerName" class="col-sm-2 control-label">客户名称<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="hidden" id="create-customerId">
-				<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
+				<c:if test="${cut!=null}">
+					<input type="hidden" id="create-customerId" value="${cut.id}">
+					<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建" value="${cut.name}">
+				</c:if>
+				<c:if test="${cut==null}">
+					<input type="hidden" id="create-customerId">
+					<input type="text" class="form-control" id="create-customerName" placeholder="支持自动补全，输入客户不存在则新建">
+				</c:if>
 			</div>
 			<label for="create-expectedDate" class="col-sm-2 control-label">预计成交日期<span style="font-size: 15px; color: red;">*</span></label>
 			<div class="col-sm-10" style="width: 300px;">
@@ -449,8 +455,15 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		<div class="form-group">
 			<label for="create-contactsName" class="col-sm-2 control-label">联系人名称&nbsp;&nbsp;<a href="javascript:void(0);" id="searchContactBtn"><span class="glyphicon glyphicon-search"></span></a></label>
 			<div class="col-sm-10" style="width: 300px;">
-				<input type="hidden" id="create-contactId">
-				<input type="text" class="form-control" id="create-contactsName" readonly>
+				<c:if test="${cot!=null}">
+					<input type="hidden" id="create-contactId" value="${cot.id}">
+					<input type="text" class="form-control" id="create-contactsName" readonly value="${cot.fullname}">
+				</c:if>
+				<c:if test="${cot==null}">
+					<input type="hidden" id="create-contactId">
+					<input type="text" class="form-control" id="create-contactsName" readonly>
+				</c:if>
+
 			</div>
 		</div>
 		

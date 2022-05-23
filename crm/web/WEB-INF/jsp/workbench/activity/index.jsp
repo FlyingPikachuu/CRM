@@ -500,6 +500,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		})
 	}
 
+
 </script>
 </head>
 <body>

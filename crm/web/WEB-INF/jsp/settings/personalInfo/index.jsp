@@ -57,6 +57,7 @@
                             $("#pi-name").text(name);
                             //关闭模态窗口
                             $("#editUserModal").modal("hide");
+                            window.location.href="settings/qx/user/logout.do";
                         }else{
                             //提示信息
                             alert(data.message);

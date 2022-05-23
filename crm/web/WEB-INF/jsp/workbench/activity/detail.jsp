@@ -23,6 +23,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 	let cancelAndSaveBtnDefault = true;
 	
 	$(function(){
+		showRemarkA();
 		$("#add-ActivityRemark").focus(function(){
 			if(cancelAndSaveBtnDefault){
 				//设置remarkDiv的高度为130px
@@ -98,8 +99,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="<img title=\"${sessionScope.userInfo.name}\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">";
 						htmlStr+="<div style='position: relative; top: -40px; left: 40px;' >";
 						htmlStr+="<h5>"+data.returnData.noteContent+"</h5>";
-						htmlStr+="<font color=\"gray\">市场活动</font> <font color=\"gray\">-</font> <b>${activity.name}</b> <small style=\"color: gray;\"> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}创建</small>";
-						htmlStr+="<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
+						htmlStr+="<font color=\"gray\">市场活动</font> <font color=\"gray\">-</font> <b>${activity.name}</b> <small style=\"color: gray;\" id='createName'> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}创建</small>";
+						htmlStr+="<div id='remarkABox' style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">";
 						htmlStr+="<a class=\"myHref\" id=\"editA\" remarkId=\""+data.returnData.id+"\"  href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
 						htmlStr+="&nbsp;&nbsp;&nbsp;&nbsp;";
 						htmlStr+="<a class=\"myHref\" id=\"deleteA\" remarkId=\""+data.returnData.id+"\"  href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-remove\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>";
@@ -108,6 +109,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="</div>";
 
 						$("#remarkDiv").before(htmlStr);
+						showRemarkA();
 					}
 					else{
 						//提示信息
@@ -194,7 +196,41 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			});
 		});
 	});
-	
+	function showRemarkA(){
+		$.ajax({
+			url:'workbench/showMenu.do',
+			type:'post',
+			datatype:'json',
+			success:function (data){
+				if(!data.includes("备注管理")){
+					let user = '${sessionScope.userInfo.name}'
+					let createBy = $("#remarkDivList small[id='createName']");
+					let a = $("#remarkDivList div[id='remarkABox']");
+					for (let i = 0; i < createBy.length; i++) {
+						// console.log(createBy[i].innerText)
+						if(!createBy[i].innerText.includes(user)) {
+							a[i].remove();
+						}
+					}
+				}else{
+					let user = '${sessionScope.userInfo.name}'
+					let createBy = $("#remarkDivList small[id='createName']");
+					let a = $("#remarkDivList div[id='remarkABox']");
+					let updA = $("#remarkABox a[id='editA']");
+					for (let i = 0; i < createBy.length; i++) {
+						// console.log(createBy[i].innerText)
+						if(!createBy[i].innerText.includes(user)) {
+							for (let j = 0; j < updA.length; j++) {
+								// console.log(createBy[i].innerText)
+								updA[i].remove();
+							}
+						}
+					}
+			}
+			}
+		})
+
+	}
 </script>
 
 </head>
@@ -307,8 +343,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				<img title="${remark.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 				<div style="position: relative; top: -40px; left: 40px;" >
 					<h5>${remark.noteContent}</h5>
-					<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small style="color: gray;"> ${remark.editFlag=="1"?remark.editTime:remark.createTime} 由${remark.editFlag=="1"?remark.editBy:remark.createBy}${remark.editFlag=="1"?"修改":"创建"}</small>
-					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+					<font color="gray">市场活动</font> <font color="gray">-</font> <b>${activity.name}</b> <small style="color: gray;" id="createName"> ${remark.editFlag=="1"?remark.editTime:remark.createTime} 由${remark.editFlag=="1"?remark.editBy:remark.createBy}${remark.editFlag=="1"?"修改":"创建"}</small>
+					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;" id="remarkABox">
 						<a class="myHref"   id="editA" remarkId="${remark.id}"  href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<a class="myHref" id="deleteA" remarkId="${remark.id}"  href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>

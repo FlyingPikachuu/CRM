@@ -32,6 +32,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 	var cancelAndSaveBtnDefault = true;
 	
 	$(function(){
+		showRemarkA();
 		$("#create-noteContent").focus(function(){
 			if(cancelAndSaveBtnDefault){
 				//设置remarkDiv的高度为130px
@@ -111,7 +112,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="<img title=\"${sessionScope.userInfo.name}\" src=\"image/user-thumbnail.png\" style=\"width: 30px; height:30px;\">"
 						htmlStr+="<div style=\"position: relative; top: -40px; left: 40px;\" >"
 						htmlStr+="<h5>"+data.returnData.noteContent+"</h5>"
-						htmlStr+="<font color=\"gray\">交易</font> <font color=\"gray\">-</font> <b>${ts.name}</b> <small style=\"color: gray;\"> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}</small>"
+						htmlStr+="<font color=\"gray\">交易</font> <font color=\"gray\">-</font> <b>${ts.name}</b> <small style=\"color: gray;\" id='createName'> "+data.returnData.createTime+" 由${sessionScope.userInfo.name}</small>"
 						htmlStr+="<div style=\"position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;\">"
 						htmlStr+="<a class=\"myHref\" id=\"editA\" remarkId=\""+data.returnData.id+"\" href=\"javascript:void(0);\"><span class=\"glyphicon glyphicon-edit\" style=\"font-size: 20px; color: #E6E6E6;\"></span></a>"
 						htmlStr+="&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -120,7 +121,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 						htmlStr+="</div>"
 						htmlStr+="</div>"
 						$("#remarkHeader").after(htmlStr);
-
+						showRemarkA();
 						$("#create-noteContent").val("");
 					}
 					else{
@@ -220,7 +221,42 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 		})
 
 	});
-	
+	function showRemarkA(){
+		$.ajax({
+			url:'workbench/showMenu.do',
+			type:'post',
+			datatype:'json',
+			success:function (data){
+				if(!data.includes("备注管理")){
+					let user = '${sessionScope.userInfo.name}'
+					let createBy = $("#remarkDivList small[id='createName']");
+					let a = $("#remarkDivList div[id='remarkABox']");
+					for (let i = 0; i < createBy.length; i++) {
+						// console.log(createBy[i].innerText)
+						if(!createBy[i].innerText.includes(user)) {
+							a[i].remove();
+						}
+					}
+				}else{
+					let user = '${sessionScope.userInfo.name}'
+					let createBy = $("#remarkDivList small[id='createName']");
+					let a = $("#remarkDivList div[id='remarkABox']");
+					let updA = $("#remarkABox a[id='editA']");
+					for (let i = 0; i < createBy.length; i++) {
+						// console.log(createBy[i].innerText)
+						if(!createBy[i].innerText.includes(user)) {
+							for (let j = 0; j < updA.length; j++) {
+								// console.log(createBy[i].innerText)
+								updA[i].remove();
+							}
+						}
+					}
+				}
+
+			}
+		})
+
+	}
 	
 	
 </script>
@@ -424,8 +460,8 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 				<img title="${trl.createBy}" src="image/user-thumbnail.png" style="width: 30px; height:30px;">
 				<div style="position: relative; top: -40px; left: 40px;" >
 					<h5>${trl.noteContent}</h5>
-					<font color="gray">交易</font> <font color="gray">-</font> <b>${ts.name}</b> <small style="color: gray;"> ${trl.editFlag=="1"?trl.editTime:trl.createTime} 由${trl.editFlag=="1"?trl.editBy:trl.createBy}${trl.editFlag=="1"?"修改":"创建"}</small>
-					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;">
+					<font color="gray">交易</font> <font color="gray">-</font> <b>${ts.name}</b> <small style="color: gray;" id="createName"> ${trl.editFlag=="1"?trl.editTime:trl.createTime} 由${trl.editFlag=="1"?trl.editBy:trl.createBy}${trl.editFlag=="1"?"修改":"创建"}</small>
+					<div style="position: relative; left: 500px; top: -30px; height: 30px; width: 100px; display: none;" id="remarkABox">
 						<a class="myHref" id="editA" remarkId="${trl.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-edit" style="font-size: 20px; color: #E6E6E6;"></span></a>
 						&nbsp;&nbsp;&nbsp;&nbsp;
 						<a class="myHref" id="deleteA" remarkId="${trl.id}" href="javascript:void(0);"><span class="glyphicon glyphicon-remove" style="font-size: 20px; color: #E6E6E6;"></span></a>

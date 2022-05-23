@@ -210,6 +210,36 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 			let nextContactTime =$.trim($("#edit-nextContactTime").val());
 			let address = $.trim($("#edit-address").val());
 
+			//表单验证
+			if(company==""){
+				alert("公司名不能为空！");
+				return;
+			}
+			if(fullname==""){
+				alert("客户名不能为空！");
+				return;
+			}
+			let regExpEmail=/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+			if(!regExpEmail.test(email)&&email!=""){
+				alert("邮件格式不正确！");
+				return;
+			}
+			let regExpPhone=/^((\d{3,4}-)|\d{3,4}-)?\d{7,8}$/;
+			if(!regExpPhone.test(phone)&&phone!=""){
+				alert("座机格式不正确！");
+				return;
+			}
+			let regExpMphone=/^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/;
+			if(!regExpMphone.test(mphone)&&mphone!=""){
+				alert("手机格式不正确！");
+				return;
+			}
+			let regExpWebsite=/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/;
+			if(!regExpWebsite.test(website)&&website!=""){
+				alert("公司网站格式不正确！");
+				return;
+			}
+
 			$.ajax({
 				url:'workbench/clue/editClue.do',
 				data:{
@@ -630,7 +660,7 @@ String basePath=request.getScheme()+"://"+request.getServerName()+":"+request.ge
 							<div class="form-group">
 								<label for="edit-nextContactTime" class="col-sm-2 control-label">下次联系时间</label>
 								<div class="col-sm-10" style="width: 300px;">
-									<input type="text" class="form-control" id="edit-nextContactTime" value="2017-05-01">
+									<input type="text" class="form-control myDate" id="edit-nextContactTime" value="2017-05-01" readonly>
 								</div>
 							</div>
 						</div>

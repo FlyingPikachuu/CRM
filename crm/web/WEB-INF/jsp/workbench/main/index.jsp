@@ -532,16 +532,27 @@
 				let date = new Date();
 				let year = date.getFullYear();
 				let month = date.getMonth()+1;
-				if(month<10&&month>0){
-					month="0"+month;
-				}
+				let sdate = new Date(date.getTime()-144*60*60*1000);
+				let syear = sdate.getFullYear();
+				let smonth = sdate.getMonth()+1;
+				let sday = sdate.getDate();
 				let day = date.getDate();
-				let start = year+'-'+month+'-'+(day-6);
-				let end = year+'-'+month+'-'+day
+				month=addZero(month);
+				smonth=addZero(smonth);
+				sday=addZero(sday);
+				day=addZero(day);
+				let start = year+'-'+smonth+'-'+sday;
+				let end = year+'-'+month+'-'+day;
 				console.log(start);
 				console.log(end);
 				$("#startDate").val(start);
 				$("#endDate").val(end);
+			}
+			function addZero(num){
+				if(num>0&&num<10){
+					num="0"+num;
+				}
+				return num;
 			}
 		</script>
 	</head>
